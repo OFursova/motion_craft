@@ -1,0 +1,43 @@
+name: Deployment to production
+
+on:
+  push:
+    branches: [ test ]
+
+jobs:
+
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy
+        id: deploy
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.PRODUCTION_SSH_HOST }}
+          username: ${{ secrets.PRODUCTION_SSH_USERNAME }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          envs: GITHUB_REF_NAME
+          script_stop: true
+          script: |
+            source ~/.profile
+            export NO_COLOR=1
+            TARGET="/var/www/entdna"
+            GIT_DIR="${HOME}/deploy/deploy.git"
+            git --git-dir="$GIT_DIR" fetch origin +refs/heads/"$GITHUB_REF_NAME":refs/heads/"$GITHUB_REF_NAME"
+            pushd $TARGET
+            php artisan down || :
+            git --work-tree="$TARGET" --git-dir="$GIT_DIR" checkout -f "$GITHUB_REF_NAME"
+            composer -n install --no-dev
+            composer dump-autoload -o
+            php artisan -n --force migrate
+            php artisan icons:cache
+            php artisan filament:cache-components
+            php artisan -n optimize
+            php artisan octane:stop
+            php artisan horizon:terminate
+            npm install
+            npm run prod
+            php artisan up
+            popd

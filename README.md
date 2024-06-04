@@ -1,4 +1,4 @@
-# Motion craft
+# ![Logo](http://127.0.0.1:8000/images/mc_fox_sm.png) Motion craft 
 
 The custom LMS for motion design courses with admin panel.
 
