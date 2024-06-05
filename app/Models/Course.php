@@ -47,8 +47,8 @@ class Course extends Model
     public function lessons(): BelongsToMany
     {
         return $this->belongsToMany(Lesson::class)
-            ->withPivot('position')
-            ->orderBy('position');
+            ->withPivot(['position', 'unit_id'])
+            ->orderBy('course_lesson.position');
     }
 
     public function units(): HasMany
