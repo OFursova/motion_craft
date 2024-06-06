@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\CourseResource\RelationManagers;
+namespace App\Filament\Admin\Resources\CourseResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -8,8 +8,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UnitsRelationManager extends RelationManager
 {
@@ -53,6 +51,7 @@ class UnitsRelationManager extends RelationManager
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('lessons_count')
+                    ->label('Lessons')
                     ->counts('lessons'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->date()

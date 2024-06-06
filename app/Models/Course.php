@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 class Course extends Model
 {
-    use HasFactory, Sluggable;
+    use HasFactory, Sluggable, SoftDeletes;
 
     protected $fillable = [
         'title',
@@ -42,6 +43,11 @@ class Course extends Model
         static::deleting(function ($query) {
             Storage::delete($query->getRawOriginal('cover'));
         });
+    }
+
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class);
     }
 
     public function lessons(): BelongsToMany

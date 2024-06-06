@@ -23,6 +23,13 @@ return new class extends Migration
             $table->boolean('visible')->default(false);
             $table->timestamps();
         });
+
+        Schema::create('course_lesson', function (Blueprint $table) {
+            $table->foreignId('course_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('lesson_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('unit_id')->nullable()->constrained()->nullOnDelete();
+            $table->bigInteger('position')->nullable()->default(0);
+        });
     }
 
     /**
@@ -31,5 +38,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('lessons');
+        Schema::dropIfExists('course_lesson');
     }
 };

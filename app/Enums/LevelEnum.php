@@ -2,26 +2,26 @@
 
 namespace App\Enums;
 
-use ReflectionClass;
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
 
-enum LevelEnum: string
+enum LevelEnum: string implements HasLabel, HasColor
 {
     case Beginner = 'beginner';
     case Intermediate = 'intermediate';
     case Advanced = 'advanced';
 
-    public static function asArray(): array
+    public function getLabel(): ?string
     {
-        return array_combine(self::getKeys(), self::getValues());
+        return $this->name;
     }
 
-    public static function getKeys(): array
+    public function getColor(): string | array | null
     {
-        return array_column(self::cases(), 'name');
-    }
-
-    public static function getValues(): array
-    {
-        return array_column(self::cases(), 'value');
+        return match ($this) {
+            self::Beginner => 'success',
+            self::Intermediate => 'warning',
+            self::Advanced => 'info',
+        };
     }
 }

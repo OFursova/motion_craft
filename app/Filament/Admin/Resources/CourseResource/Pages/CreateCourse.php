@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\CourseResource\Pages;
+namespace App\Filament\Admin\Resources\CourseResource\Pages;
 
-use App\Filament\Resources\CourseResource;
-use Filament\Actions;
+use App\Filament\Admin\Resources\CourseResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateCourse extends CreateRecord

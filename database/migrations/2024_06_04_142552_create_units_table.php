@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('units', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
-            $table->unsignedInteger('position')->default(0);
+            $table->bigInteger('position')->nullable()->default(0);
             $table->foreignId('course_id')->nullable()->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

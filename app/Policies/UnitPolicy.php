@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Unit;
 use App\Models\User;
+use App\Services\Utils;
 use Illuminate\Auth\Access\Response;
 
 class UnitPolicy
@@ -29,7 +30,7 @@ class UnitPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return Utils::isAdmin($user);
     }
 
     /**
@@ -37,7 +38,7 @@ class UnitPolicy
      */
     public function update(User $user, Unit $unit): bool
     {
-        return true;
+        return Utils::isAdmin($user);
     }
 
     /**
@@ -45,7 +46,7 @@ class UnitPolicy
      */
     public function delete(User $user, Unit $unit): bool
     {
-        return true;
+        return Utils::isAdmin($user);
     }
 
     /**
@@ -53,7 +54,7 @@ class UnitPolicy
      */
     public function restore(User $user, Unit $unit): bool
     {
-        return true;
+        return Utils::isAdmin($user);
     }
 
     /**
@@ -61,6 +62,6 @@ class UnitPolicy
      */
     public function forceDelete(User $user, Unit $unit): bool
     {
-        return true;
+        return Utils::isAdmin($user);
     }
 }

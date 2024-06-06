@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Lesson;
 use App\Models\User;
+use App\Services\Utils;
 use Illuminate\Auth\Access\Response;
 
 class LessonPolicy
@@ -21,7 +22,7 @@ class LessonPolicy
      */
     public function view(User $user, Lesson $lesson): bool
     {
-        return true;
+        return Utils::isAdmin($user) || $lesson->visible;
     }
 
     /**
@@ -29,7 +30,7 @@ class LessonPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return Utils::isAdmin($user);
     }
 
     /**
@@ -37,7 +38,7 @@ class LessonPolicy
      */
     public function update(User $user, Lesson $lesson): bool
     {
-        return true;
+        return Utils::isAdmin($user);
     }
 
     /**
@@ -45,7 +46,7 @@ class LessonPolicy
      */
     public function delete(User $user, Lesson $lesson): bool
     {
-        return true;
+        return Utils::isAdmin($user);
     }
 
     /**
@@ -53,7 +54,7 @@ class LessonPolicy
      */
     public function restore(User $user, Lesson $lesson): bool
     {
-        return true;
+        return Utils::isAdmin($user);
     }
 
     /**
@@ -61,6 +62,6 @@ class LessonPolicy
      */
     public function forceDelete(User $user, Lesson $lesson): bool
     {
-        return true;
+        return Utils::isAdmin($user);
     }
 }

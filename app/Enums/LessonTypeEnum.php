@@ -2,25 +2,29 @@
 
 namespace App\Enums;
 
-enum LessonTypeEnum: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasIcon;
+use Filament\Support\Contracts\HasLabel;
+
+enum LessonTypeEnum: string implements HasLabel, HasIcon
 {
     case File = 'file';
     case Quiz = 'quiz';
     case Text = 'text';
     case Video = 'video';
 
-    public static function asArray(): array
+    public function getLabel(): ?string
     {
-        return array_combine(self::getKeys(), self::getValues());
+        return $this->name;
     }
 
-    public static function getKeys(): array
+    public function getIcon(): ?string
     {
-        return array_column(self::cases(), 'name');
-    }
-
-    public static function getValues(): array
-    {
-        return array_column(self::cases(), 'value');
+        return match ($this) {
+            self::File => 'heroicon-s-document-arrow-down',
+            self::Quiz => 'heroicon-o-clipboard-document-check',
+            self::Text => 'heroicon-o-document-text',
+            self::Video => 'heroicon-c-play-circle',
+        };
     }
 }

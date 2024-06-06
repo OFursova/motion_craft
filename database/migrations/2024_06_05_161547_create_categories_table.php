@@ -11,18 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('courses', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('title')->nullable();
+            $table->string('name')->nullable();
             $table->string('slug')->nullable();
             $table->string('overview')->nullable();
-            $table->text('description')->nullable();
             $table->string('cover')->nullable();
-            $table->string('level')->nullable();
-            $table->boolean('free')->default(false);
-            $table->boolean('visible')->default(false);
             $table->timestamps();
-            $table->softDeletes();
+        });
+
+        Schema::create('category_course', function (Blueprint $table) {
+            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('course_id')->constrained()->cascadeOnDelete();
+            $table->bigInteger('position')->nullable()->default(0);
         });
     }
 
@@ -31,6 +32,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('courses');
+        Schema::dropIfExists('categories');
+        Schema::dropIfExists('category_course');
     }
 };

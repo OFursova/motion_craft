@@ -2,12 +2,12 @@
 
 namespace App\Policies;
 
-use App\Models\Course;
+use App\Models\Category;
 use App\Models\User;
 use App\Services\Utils;
 use Illuminate\Auth\Access\Response;
 
-class CoursePolicy
+class CategoryPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -20,9 +20,9 @@ class CoursePolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Course $course): bool
+    public function view(User $user, Category $category): bool
     {
-        return Utils::isAdmin($user) || $course->visible;
+        return true;
     }
 
     /**
@@ -36,7 +36,7 @@ class CoursePolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Course $course): bool
+    public function update(User $user, Category $category): bool
     {
         return Utils::isAdmin($user);
     }
@@ -44,7 +44,7 @@ class CoursePolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Course $course): bool
+    public function delete(User $user, Category $category): bool
     {
         return Utils::isAdmin($user);
     }
@@ -52,7 +52,7 @@ class CoursePolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Course $course): bool
+    public function restore(User $user, Category $category): bool
     {
         return Utils::isAdmin($user);
     }
@@ -60,7 +60,7 @@ class CoursePolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Course $course): bool
+    public function forceDelete(User $user, Category $category): bool
     {
         return Utils::isAdmin($user);
     }

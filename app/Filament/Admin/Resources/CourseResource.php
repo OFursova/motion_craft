@@ -1,37 +1,50 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Admin\Resources;
 
 use App\Enums\LevelEnum;
-use App\Filament\Resources\CourseResource\Pages;
-use App\Filament\Resources\CourseResource\RelationManagers;
+use App\Filament\Admin\Resources\CourseResource\Pages;
+use App\Filament\Admin\Resources\CourseResource\Pages\CreateCourse;
+use App\Filament\Admin\Resources\CourseResource\Pages\EditCourse;
+use App\Filament\Admin\Resources\CourseResource\Pages\ListCourses;
+use App\Filament\Admin\Resources\CourseResource\RelationManagers;
+use App\Filament\Admin\Resources\CourseResource\RelationManagers\LessonsRelationManager;
+use App\Filament\Admin\Resources\CourseResource\RelationManagers\UnitsRelationManager;
 use App\Models\Course;
 use Filament\Forms;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use phpDocumentor\Reflection\Types\Boolean;
 
 class CourseResource extends Resource
 {
     protected static ?string $model = Course::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-book-open';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('title')
+                Forms\Components\Textarea::make('title')
                     ->required()
                     ->string()
                     ->maxLength(255)
-                    ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/')
-                    ->columnSpan('full'),
+                    ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/'),
+                Forms\Components\FileUpload::make('cover')
+                    ->directory('cover-images')
+                    ->image()
+                    ->maxSize(1024)
+                    ->imageEditor()
+                    ->imageEditorAspectRatios([
+                        null,
+                        '16:9',
+                        '4:3',
+                        '1:1',
+                    ])
+                    ->downloadable(),
                 Forms\Components\Textarea::make('overview')
                     ->nullable()
                     ->string()
@@ -47,7 +60,7 @@ class CourseResource extends Resource
                 Forms\Components\Fieldset::make('Settings')
                     ->schema([
                         Forms\Components\Select::make('level')
-                            ->options(array_flip(LevelEnum::asArray()))
+                            ->options(LevelEnum::class)
                             ->nullable(),
                         Forms\Components\Toggle::make('free')
                             ->onIcon('heroicon-o-bolt')
@@ -59,18 +72,14 @@ class CourseResource extends Resource
                             ->onColor('success'),
                     ])->columns(1)
                     ->columnSpan('sm'),
-                Forms\Components\FileUpload::make('cover')
-                    ->directory('cover-images')
-                    ->image()
-                    ->maxSize(1024)
-                    ->imageEditor()
-                    ->imageEditorAspectRatios([
-                        null,
-                        '16:9',
-                        '4:3',
-                        '1:1',
-                    ])
-                    ->downloadable(),
+                Forms\Components\Fieldset::make('Categories')
+                    ->schema([
+                        Forms\Components\CheckboxList::make('categories')
+                            ->label('')
+                            ->columns(3)
+                            ->relationship('categories', 'name'),
+                    ])->columns(1)
+                    ->columnSpan('sm'),
             ]);
     }
 
@@ -82,12 +91,14 @@ class CourseResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
-                    ->limit(60)
+                    ->limit(50)
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('level')
+                    ->badge()
                     ->sortable(),
-                Tables\Columns\ImageColumn::make('cover'),
+                Tables\Columns\ImageColumn::make('cover')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\ToggleColumn::make('free')
                     ->onIcon('heroicon-o-bolt')
                     ->offIcon('heroicon-o-banknotes')
@@ -98,16 +109,22 @@ class CourseResource extends Resource
                     ->offIcon('heroicon-c-eye-slash')
                     ->onColor('success')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('categories.name')
+                    ->badge()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->date()
                     ->sortable(),
             ])
+            ->defaultSort('id', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('level')
-                    ->options(array_flip(LevelEnum::asArray()))
+                    ->options(LevelEnum::class)
             ])
             ->actions([
+                //ActionGroup::make([
                 Tables\Actions\EditAction::make(),
+                //])->tooltip('Actions'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -119,17 +136,17 @@ class CourseResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\UnitsRelationManager::class,
-            RelationManagers\LessonsRelationManager::class,
+            UnitsRelationManager::class,
+            LessonsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCourses::route('/'),
-            'create' => Pages\CreateCourse::route('/create'),
-            'edit' => Pages\EditCourse::route('/{record}/edit'),
+            'index' => ListCourses::route('/'),
+            'create' => CreateCourse::route('/create'),
+            'edit' => EditCourse::route('/{record}/edit'),
         ];
     }
 }

@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\CourseResource\RelationManagers;
+namespace App\Filament\Admin\Resources\CourseResource\RelationManagers;
 
 use App\Enums\LessonTypeEnum;
-use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\Unit;
 use App\Services\Converter;
@@ -13,8 +12,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Cache;
 
 class LessonsRelationManager extends RelationManager
@@ -40,7 +37,7 @@ class LessonsRelationManager extends RelationManager
                     ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/')
                     ->columnSpan('full'),
                 Forms\Components\Select::make('type')
-                    ->options(array_flip(LessonTypeEnum::asArray()))
+                    ->options(LessonTypeEnum::class)
                     ->nullable(),
                 Forms\Components\TextInput::make('duration')
                     ->placeholder('00:00:00')
@@ -103,7 +100,7 @@ class LessonsRelationManager extends RelationManager
             ->recordTitleAttribute('title')
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                    ->limit(60)
+                    ->limit(40)
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type')
@@ -118,6 +115,7 @@ class LessonsRelationManager extends RelationManager
                         $units = Cache::remember('units', 5 * 60, fn() => Unit::select(['id', 'title'])->get());
                         return $units->where('id', $record->unit_id)->first()->title;
                     })
+                    ->limit(30)
                     ->label('Unit')
                     ->sortable(),
                 Tables\Columns\ToggleColumn::make('free')
@@ -136,7 +134,7 @@ class LessonsRelationManager extends RelationManager
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
-                    ->options(array_flip(LessonTypeEnum::asArray()))
+                    ->options(LessonTypeEnum::class)
             ])
             ->headerActions([
                 Tables\Actions\AttachAction::make(),
