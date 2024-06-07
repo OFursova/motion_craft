@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\LessonTypeEnum;
+use App\Models\Traits\Publishable;
 use App\Services\Converter;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Lesson extends Model
 {
-    use HasFactory;
+    use HasFactory, Publishable;
 
     protected $appends = [
         'duration_in_minutes',

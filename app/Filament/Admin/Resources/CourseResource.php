@@ -17,10 +17,14 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CourseResource extends Resource
 {
     protected static ?string $model = Course::class;
+
+    protected static ?string $navigationGroup = 'Content';
 
     protected static ?string $navigationIcon = 'heroicon-o-book-open';
 
@@ -114,21 +118,27 @@ class CourseResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->translateLabel(),
             ])
             ->defaultSort('id', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('level')
-                    ->options(LevelEnum::class)
+                    ->options(LevelEnum::class),
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
                 //ActionGroup::make([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\DeleteAction::make()->iconButton(),
+                Tables\Actions\RestoreAction::make()->iconButton(),
                 //])->tooltip('Actions'),
-            ])
+            ], )
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -148,5 +158,18 @@ class CourseResource extends Resource
             'create' => CreateCourse::route('/create'),
             'edit' => EditCourse::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Courses');
     }
 }

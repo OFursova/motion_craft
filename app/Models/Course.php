@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\LevelEnum;
+use App\Models\Traits\Publishable;
 use App\Models\Traits\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Course extends Model
 {
-    use HasFactory, Sluggable, SoftDeletes;
+    use HasFactory, Publishable, Sluggable, SoftDeletes;
 
     protected $fillable = [
         'title',
@@ -26,6 +27,7 @@ class Course extends Model
         'visible',
         'created_at',
         'updated_at',
+        'deleted_at',
     ];
 
     protected function casts(): array
@@ -41,7 +43,9 @@ class Course extends Model
     {
         parent::boot();
         static::deleting(function ($query) {
-            Storage::delete($query->getRawOriginal('cover'));
+            if ($query->cover) {
+                Storage::delete($query->getRawOriginal('cover'));
+            }
         });
     }
 

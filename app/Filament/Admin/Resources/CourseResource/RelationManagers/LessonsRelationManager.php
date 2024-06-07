@@ -42,7 +42,7 @@ class LessonsRelationManager extends RelationManager
                 Forms\Components\TextInput::make('duration')
                     ->placeholder('00:00:00')
                     ->regex('/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/')
-                    ->formatStateUsing(fn (string $state): string => Converter::secondsToString($state))
+                    ->formatStateUsing(fn (?string $state): string => Converter::secondsToString($state))
                     ->dehydrateStateUsing(fn (string $state): string => Converter::stringToSeconds($state)),
                 Forms\Components\TextInput::make('url')
                     ->nullable()
@@ -110,14 +110,18 @@ class LessonsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('position')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('unit_id')
-                    ->state(function (Lesson $record) {
-                        $units = Cache::remember('units', 5 * 60, fn() => Unit::select(['id', 'title'])->get());
-                        return $units->where('id', $record->unit_id)->first()->title;
-                    })
+                Tables\Columns\TextColumn::make('units.title')
                     ->limit(30)
                     ->label('Unit')
                     ->sortable(),
+                //Tables\Columns\TextColumn::make('unit_id')
+                //    ->state(function (Lesson $record) {
+                //        $units = Cache::remember('units', 5 * 60, fn() => Unit::select(['id', 'title'])->get());
+                //        return $units->where('id', $record->unit_id)->first()->title;
+                //    })
+                //    ->limit(30)
+                //    ->label('Unit')
+                //    ->sortable(),
                 Tables\Columns\ToggleColumn::make('free')
                     ->onIcon('heroicon-o-bolt')
                     ->offIcon('heroicon-o-banknotes')

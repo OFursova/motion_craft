@@ -14,6 +14,10 @@ class CoursePolicy
      */
     public function viewAny(User $user): bool
     {
+        //if (Filament::getCurrentPanel()->getId() === 'admin') {
+        //    return $user->is_admin == 1;
+        //}
+
         return true;
     }
 
