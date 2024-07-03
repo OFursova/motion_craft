@@ -4,6 +4,7 @@ namespace App\Filament\App\Resources\CourseResource\Pages;
 
 use App\Filament\App\Resources\CourseResource;
 use Filament\Actions;
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 
 class ListCourses extends ListRecords

@@ -17,9 +17,15 @@ class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static ?string $navigationGroup = 'Content';
+    protected static ?string $navigationGroup = 'Content Management';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?string $navigationLabel = 'Categories';
+
+    protected static ?string $modelLabel = 'Course Categories';
+
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -46,7 +52,8 @@ class CategoryResource extends Resource
                     ->nullable()
                     ->string()
                     ->maxLength(255)
-                    ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/'),
+                    ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/')
+                    ->columnSpanFull(),
             ]);
     }
 

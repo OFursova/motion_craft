@@ -32,9 +32,13 @@ class AppPanelProvider extends PanelProvider
             ->emailVerification()
             ->profile()
             ->topNavigation()
+            ->brandLogo(asset('images/mc_logo_horizontal_transparent.png'))
+            ->brandLogoHeight('4rem')
             ->colors([
                 'primary' => Color::Emerald,
             ])
+            ->font('Montserrat')
+            ->favicon(asset('images/mc_logo.png'))
             ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\\Filament\\App\\Resources')
             ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\\Filament\\App\\Pages')
             ->pages([

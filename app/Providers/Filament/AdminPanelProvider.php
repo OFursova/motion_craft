@@ -29,10 +29,14 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandLogo(asset('images/mc_logo_horizontal_transparent.png'))
+            ->brandLogoHeight('4rem')
             ->colors([
                 'primary' => Color::Violet,
                 'gray' => Color::Stone,
             ])
+            ->font('Montserrat')
+            ->favicon(asset('images/mc_logo.png'))
             ->sidebarCollapsibleOnDesktop()
             ->sidebarWidth('18rem')
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')

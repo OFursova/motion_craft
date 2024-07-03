@@ -24,9 +24,11 @@ class CourseResource extends Resource
 {
     protected static ?string $model = Course::class;
 
-    protected static ?string $navigationGroup = 'Content';
+    protected static ?string $navigationGroup = 'Content Management';
 
     protected static ?string $navigationIcon = 'heroicon-o-book-open';
+
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -115,7 +117,8 @@ class CourseResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('categories.name')
                     ->badge()
-                    ->sortable(),
+                    ->sortable()
+                    ->visibleFrom('md'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->date()
                     ->sortable()
