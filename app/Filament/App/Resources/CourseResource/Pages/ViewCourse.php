@@ -10,10 +10,12 @@ class ViewCourse extends ViewRecord
 {
     protected static string $resource = CourseResource::class;
 
+    protected ?string $heading = '';
+
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+
         ];
     }
 }
