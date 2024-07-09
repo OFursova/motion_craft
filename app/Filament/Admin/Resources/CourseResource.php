@@ -24,8 +24,6 @@ class CourseResource extends Resource
 {
     protected static ?string $model = Course::class;
 
-    protected static ?string $navigationGroup = 'Content Management';
-
     protected static ?string $navigationIcon = 'heroicon-o-book-open';
 
     protected static ?int $navigationSort = 1;
@@ -35,11 +33,13 @@ class CourseResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Textarea::make('title')
+                    ->translateLabel()
                     ->required()
                     ->string()
                     ->maxLength(255)
                     ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/'),
                 Forms\Components\FileUpload::make('cover')
+                    ->translateLabel()
                     ->directory('cover-images')
                     ->image()
                     ->maxSize(1024)
@@ -52,33 +52,40 @@ class CourseResource extends Resource
                     ])
                     ->downloadable(),
                 Forms\Components\Textarea::make('overview')
+                    ->translateLabel()
                     ->nullable()
                     ->string()
                     ->maxLength(255)
                     ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/')
                     ->columnSpan('full'),
                 Forms\Components\RichEditor::make('description')
+                    ->translateLabel()
                     ->nullable()
                     ->string()
                     ->maxLength(5000)
                     ->fileAttachmentsDirectory('attachments')
                     ->columnSpan('full'),
                 Forms\Components\Fieldset::make('Settings')
+                    ->translateLabel()
                     ->schema([
                         Forms\Components\Select::make('level')
+                            ->translateLabel()
                             ->options(LevelEnum::class)
                             ->nullable(),
                         Forms\Components\Toggle::make('free')
+                            ->translateLabel()
                             ->onIcon('heroicon-o-bolt')
                             ->offIcon('heroicon-o-banknotes')
                             ->onColor('warning'),
                         Forms\Components\Toggle::make('visible')
+                            ->translateLabel()
                             ->onIcon('heroicon-c-eye')
                             ->offIcon('heroicon-c-eye-slash')
                             ->onColor('success'),
                     ])->columns(1)
                     ->columnSpan('sm'),
                 Forms\Components\Fieldset::make('Categories')
+                    ->translateLabel()
                     ->schema([
                         Forms\Components\CheckboxList::make('categories')
                             ->label('')
@@ -95,34 +102,48 @@ class CourseResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('title')
+                    ->translateLabel()
                     ->limit(50)
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('level')
+                    ->translateLabel()
+                    ->formatStateUsing(fn($state) => __('courses.levels.'. $state->name))
                     ->badge()
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('cover')
+                    ->translateLabel()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\ToggleColumn::make('free')
                     ->onIcon('heroicon-o-bolt')
                     ->offIcon('heroicon-o-banknotes')
                     ->onColor('warning')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\ToggleColumn::make('visible')
                     ->onIcon('heroicon-c-eye')
                     ->offIcon('heroicon-c-eye-slash')
                     ->onColor('success')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('categories.name')
+                    ->translateLabel()
                     ->badge()
                     ->sortable()
+                    ->toggleable()
                     ->visibleFrom('md'),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->date()
+                    ->translateLabel()
+                    ->dateTime('d-m-Y H:i', 'EEST')
                     ->sortable()
-                    ->translateLabel(),
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->translateLabel()
+                    ->dateTime('d-m-Y H:i', 'EEST')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('id', 'desc')
             ->filters([
@@ -171,8 +192,18 @@ class CourseResource extends Resource
             ]);
     }
 
+    public static function getModelLabel(): string
+    {
+        return __('Course');
+    }
+
     public static function getPluralModelLabel(): string
     {
         return __('Courses');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Content Management');
     }
 }

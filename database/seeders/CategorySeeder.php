@@ -13,14 +13,19 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         Category::factory()
-            ->count(6)
+            ->count(11)
             ->sequence(
                 ['name' => 'After Effects'],
                 ['name' => 'Blender'],
                 ['name' => 'Cinema 4D'],
-                ['name' => 'Live Project'],
-                ['name' => 'Principles of Animation'],
-                ['name' => 'Tips'],
+                ['name' => 'VFX'],
+                ['name' => '2D'],
+                ['name' => '3D'],
+                ['name' => 'Псевдо 3D'],
+                ['name' => 'Проэкт'],
+                ['name' => 'Принципы анимации'],
+                ['name' => 'Скульптинг'],
+                ['name' => 'Советы'],
             )
             ->create();
     }

@@ -18,8 +18,8 @@ class CourseFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->word(),
-            'overview' => fake()->sentence,
+            'title' => fake()->sentence(),
+            'overview' => fake()->sentence(),
             'description' => fake()->realText(100),
             'cover' => fake()->imageUrl(),
             'level' => fake()->randomElement(LevelEnum::cases()),

@@ -33,36 +33,36 @@ class ListCourses extends ListRecords
             ->selectRaw('sum(case when deleted_at is not null then 1 else 0 end) as archived')
             ->first();
 
-        $tabs['all'] = Tab::make('All')
+        $tabs['all'] = Tab::make(__('All'))
             ->badge($courseCounts->total)
             ->icon('heroicon-o-star');
 
-        $tabs['beginner'] = Tab::make('Beginner')
+        $tabs['beginner'] = Tab::make(__('courses.levels.Beginner'))
             ->badge($courseCounts->beginner)
             ->modifyQueryUsing(fn ($query) => $query->where('level', 'beginner'))
             ->icon('heroicon-o-book-open');
 
-        $tabs['intermediate'] = Tab::make('Intermediate')
+        $tabs['intermediate'] = Tab::make(__('courses.levels.Intermediate'))
             ->badge($courseCounts->intermediate)
             ->modifyQueryUsing(fn ($query) => $query->where('level', 'intermediate'))
             ->icon('heroicon-o-light-bulb');
 
-        $tabs['advanced'] = Tab::make('Advanced')
+        $tabs['advanced'] = Tab::make(__('courses.levels.Advanced'))
             ->badge($courseCounts->advanced)
             ->modifyQueryUsing(fn ($query) => $query->where('level', 'advanced'))
             ->icon('heroicon-s-rocket-launch');
 
-        $tabs['free'] = Tab::make('Free')
+        $tabs['free'] = Tab::make(__('courses.Free'))
             ->badge($courseCounts->free)
             ->modifyQueryUsing(fn ($query) => $query->free())
             ->icon('heroicon-o-bolt');
 
-        $tabs['visible'] = Tab::make('Visible')
+        $tabs['visible'] = Tab::make(__('courses.Visible'))
             ->badge($courseCounts->public)
             ->modifyQueryUsing(fn ($query) => $query->visible())
             ->icon('heroicon-o-eye');
 
-        $tabs['archived'] = Tab::make('Archived')
+        $tabs['archived'] = Tab::make(__('courses.Archived'))
             ->badge($courseCounts->archived)
             ->modifyQueryUsing(fn ($query) => $query->onlyTrashed())
             ->icon('heroicon-o-archive-box');

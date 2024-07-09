@@ -18,7 +18,7 @@ class UnitFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->word(),
+            'title' => fake()->sentence(),
             'position' => fake()->randomDigitNotNull(),
             'course_id' => Course::select('id')->inRandomOrder()->value('id') ?? Course::factory()->create()->id,
         ];

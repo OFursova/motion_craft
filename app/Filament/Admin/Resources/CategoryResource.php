@@ -17,13 +17,7 @@ class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static ?string $navigationGroup = 'Content Management';
-
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
-    protected static ?string $navigationLabel = 'Categories';
-
-    protected static ?string $modelLabel = 'Course Categories';
 
     protected static ?int $navigationSort = 2;
 
@@ -47,6 +41,8 @@ class CategoryResource extends Resource
                         '4:3',
                         '1:1',
                     ])
+                    ->previewable()
+                    ->openable()
                     ->downloadable(),
                 Forms\Components\Textarea::make('overview')
                     ->nullable()
@@ -65,21 +61,27 @@ class CategoryResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\ImageColumn::make('cover')
+                    ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->translateLabel()
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('overview')
+                    ->translateLabel()
                     ->limit(40),
                 Tables\Columns\TextColumn::make('courses_count')
                     ->label('Courses')
+                    ->translateLabel()
                     ->counts('courses'),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->translateLabel()
+                    ->dateTime('d-m-Y H:i', 'EEST')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->translateLabel()
+                    ->dateTime('d-m-Y H:i', 'EEST')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -110,5 +112,25 @@ class CategoryResource extends Resource
             'create' => Pages\CreateCategory::route('/create'),
             'edit' => Pages\EditCategory::route('/{record}/edit'),
         ];
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Course Category');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Course Categories');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Categories');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Content Management');
     }
 }

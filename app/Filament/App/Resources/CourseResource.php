@@ -6,6 +6,7 @@ use App\Enums\DurationEnum;
 use App\Enums\LevelEnum;
 use App\Filament\App\Resources\CourseResource\Pages;
 use App\Filament\App\Resources\CourseResource\RelationManagers;
+use App\Filament\Entries\CurriculumEntry;
 use App\Models\Course;
 use App\Models\Episode;
 use Filament\Forms;
@@ -26,6 +27,8 @@ use Filament\Tables\Columns\Layout\Grid;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class CourseResource extends Resource
 {
@@ -89,7 +92,8 @@ class CourseResource extends Resource
                 Split::make([
                     Section::make()
                         ->headerActions([
-                            Action::make('browse all courses')
+                            Action::make('Browse all courses')
+                                ->translateLabel()
                                 ->url(fn(): string => route('filament.app.resources.courses.index'))
                                 ->icon('heroicon-s-arrow-left')
                         ])
@@ -100,9 +104,9 @@ class CourseResource extends Resource
                                 ->height(200)
                                 ->extraImgAttributes(['class' => 'w-full rounded']),
                             TextEntry::make('description')
+                                ->hiddenLabel()
                                 ->maxWidth(MaxWidth::Small)
-                                ->html()
-                                ->hiddenLabel(),
+                                ->html(),
                             TextEntry::make('categories.name')
                                 ->hiddenLabel()
                                 ->badge()
@@ -122,8 +126,10 @@ class CourseResource extends Resource
                                     TextEntry::make('updated_at')
                                         ->hiddenLabel()
                                         ->badge()
-                                        ->formatStateUsing(fn($state) => 'Last updated: ' . $state->format('F d, Y'))
-                                        ->alignRight(),
+                                        ->prefix(__('Last updated').': ')
+                                        ->formatStateUsing(fn ($state) => $state->isoFormat('Do MMMM Y'))
+                                        ->alignRight()
+                                        ->lineClamp(2),
                                     // button to watch
                                     // has been started flag
                                 ]),
@@ -131,44 +137,24 @@ class CourseResource extends Resource
                                 ->schema([
                                     TextEntry::make('units_count')
                                         ->hiddenLabel()
-                                        ->suffix(' units')
+                                        ->formatStateUsing(fn($state) => $state . ' ' . trans_choice('courses.units', $state))
                                         ->icon('heroicon-o-bookmark'),
                                     TextEntry::make('lessons_count')
                                         ->hiddenLabel()
-                                        ->suffix(' lessons')
+                                        ->formatStateUsing(fn($state) => $state . ' ' . trans_choice('courses.lessons', $state))
                                         ->icon('heroicon-o-book-open'),
                                     TextEntry::make('lessons_sum_duration')
-                                        ->formatStateUsing(fn($state) => DurationEnum::forHumans($state, true) ?: '0m')
+                                        ->formatStateUsing(fn($state) => DurationEnum::forHumans($state, true) ?: __('0m'))
                                         ->hiddenLabel()
                                         ->icon('heroicon-o-clock'),
                                     TextEntry::make('level')
                                         ->hiddenLabel()
+                                        ->formatStateUsing(fn($state) => __('courses.levels.'. $state->name))
                                         ->icon('heroicon-o-chart-bar'),
                                 ])->columns(4),
-                            Section::make('Curriculum')
+                            Section::make(__('Curriculum'))
                                 ->collapsible()
-                                ->schema([
-                                    RepeatableEntry::make('units')
-                                        ->hiddenLabel()
-                                        ->schema([
-                                            TextEntry::make('title')
-                                                ->hiddenLabel()
-                                                ->icon('heroicon-o-bookmark')
-                                                ->weight('font-bold'),
-                                            RepeatableEntry::make('lessons')
-                                                ->hiddenLabel()
-                                                ->schema([
-                                                    TextEntry::make('title')
-                                                        ->hiddenLabel()
-                                                        ->icon('heroicon-o-play-circle'),
-                                                    TextEntry::make('duration')
-                                                        ->hiddenLabel()
-                                                        ->formatStateUsing(fn($state) => DurationEnum::forHumans($state))
-                                                        ->icon('heroicon-o-clock'),
-                                                ])->columns(2)
-
-                                        ])->contained(false)->columns(1),
-                                ]),
+                                ->schema(CurriculumEntry::schema($infolist->getRecord())),
                         ])
                 ])
                     ->from('md')
@@ -193,12 +179,16 @@ class CourseResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::where('created_at', '<', today()->subWeek())->exists()
-            ? 'NEW'
-            : null;
+        return Cache::remember('course_badge', 3 * 60 * 60,
+            fn () => static::getModel()::where('created_at', '<', today()->subWeek())->exists() ? 'NEW' : null);
     }
 
-    public static function getNavigationLabel(): string
+    public static function getModelLabel(): string
+    {
+        return __('Course');
+    }
+
+    public static function getPluralModelLabel(): string
     {
         return __('Courses');
     }

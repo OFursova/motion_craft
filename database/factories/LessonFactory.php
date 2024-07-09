@@ -18,11 +18,11 @@ class LessonFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->word(),
+            'title' => fake()->sentence(),
             'type' => fake()->randomElement(LessonTypeEnum::cases()),
-            'overview' => fake()->sentence,
+            'overview' => fake()->sentence(),
             'url' => fake()->url,
-            'content' => null,
+            'content' => rand(0,3) > 2 ? fake()->randomHtml() : null,
             'duration' => fake()->randomDigitNotNull(),
             'free' => fake()->boolean,
             'visible' => fake()->boolean,

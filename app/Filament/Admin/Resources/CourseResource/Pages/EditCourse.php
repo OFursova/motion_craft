@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources\CourseResource\Pages;
 use App\Filament\Admin\Resources\CourseResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Contracts\Support\Htmlable;
 
 class EditCourse extends EditRecord
 {
@@ -17,5 +18,10 @@ class EditCourse extends EditRecord
             Actions\ForceDeleteAction::make(),
             Actions\RestoreAction::make(),
         ];
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        return __('Edit');
     }
 }
