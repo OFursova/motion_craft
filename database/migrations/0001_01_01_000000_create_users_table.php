@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('avatar_url')->nullable();
             $table->string('customer_id')->nullable()->index();
             $table->string('ip')->nullable();
+            $table->boolean('is_admin')->default(false);
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

@@ -11,6 +11,7 @@ use App\Models\Course;
 use App\Models\Episode;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Actions;
 use Filament\Infolists\Components\Actions\Action;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\RepeatableEntry;
@@ -19,6 +20,7 @@ use Filament\Infolists\Components\Split;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\MaxWidth;
@@ -36,6 +38,13 @@ class CourseResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-book-open';
 
+    protected static ?string $recordTitleAttribute = 'title';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title', 'categories.name'];
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -51,6 +60,10 @@ class CourseResource extends Resource
                 Grid::make()
                     ->columns(1)
                     ->schema([
+                        Tables\Columns\TextColumn::make('level')
+                            ->translateLabel()
+                            ->formatStateUsing(fn($state) => __('courses.levels.'. $state->name))
+                            ->badge(),
                         Tables\Columns\ImageColumn::make('cover')
                             ->defaultImageUrl(asset('storage/cover-images/cover_img_1.webp'))
                             ->height(200)
@@ -61,6 +74,8 @@ class CourseResource extends Resource
                             ->searchable(),
                         Tables\Columns\TextColumn::make('overview')
                             ->html(),
+                        Tables\Columns\TextColumn::make('categories.name')
+                            ->badge(),
                     ])->extraAttributes(['class' => 'justify-between']),
             ])
             ->contentGrid(['md' => 2, 'xl' => 3])
@@ -77,7 +92,9 @@ class CourseResource extends Resource
                 Tables\Filters\TernaryFilter::make('free'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->button()
+                    ->color(Color::Lime),
             ]);
     }
 
@@ -126,12 +143,21 @@ class CourseResource extends Resource
                                     TextEntry::make('updated_at')
                                         ->hiddenLabel()
                                         ->badge()
-                                        ->prefix(__('Last updated').': ')
-                                        ->formatStateUsing(fn ($state) => $state->isoFormat('Do MMMM Y'))
+                                        ->prefix(__('Last updated') . ': ')
+                                        ->formatStateUsing(fn($state) => $state->isoFormat('Do MMMM Y'))
                                         ->alignRight()
                                         ->lineClamp(2),
-                                    // button to watch
                                     // has been started flag
+                                    Actions::make([
+                                        Actions\Action::make('watch')
+//                                            ->label(fn (Course $course) => auth()->user()->watchedEpisodes()->where('course_id', $course->id)->exists()
+//                                                ? 'Continue watching'
+//                                                : 'Start watching')
+                                            ->button()
+                                            ->icon('heroicon-o-play-circle')
+                                            ->visible(true)
+                                            ->action(fn (Course $course) => $this->redirectRoute('courses.episodes.show', ['course' => $course]))
+                                    ]),
                                 ]),
                             Section::make('')
                                 ->schema([
@@ -149,7 +175,7 @@ class CourseResource extends Resource
                                         ->icon('heroicon-o-clock'),
                                     TextEntry::make('level')
                                         ->hiddenLabel()
-                                        ->formatStateUsing(fn($state) => __('courses.levels.'. $state->name))
+                                        ->formatStateUsing(fn($state) => __('courses.levels.' . $state->name))
                                         ->icon('heroicon-o-chart-bar'),
                                 ])->columns(4),
                             Section::make(__('Curriculum'))
@@ -180,7 +206,7 @@ class CourseResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         return Cache::remember('course_badge', 3 * 60 * 60,
-            fn () => static::getModel()::where('created_at', '<', today()->subWeek())->exists() ? 'NEW' : null);
+            fn() => static::getModel()::where('created_at', '<', today()->subWeek())->exists() ? 'NEW' : null);
     }
 
     public static function getModelLabel(): string

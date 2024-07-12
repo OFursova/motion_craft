@@ -19,11 +19,17 @@ class CourseSeeder extends Seeder
         Course::factory()
             ->has(Lesson::factory(5))
             ->hasAttached(Category::inRandomOrder()->limit(rand(3,5))->get())
-            ->create();
+            ->create([
+                'cover' => '/cover-images/cover_img_1.webp',
+                'visible' => true,
+            ]);
 
         $course = Course::factory()
             ->hasAttached(Category::inRandomOrder()->limit(rand(3,5))->get())
-            ->create();
+            ->create([
+                'cover' => '/cover-images/cover_img_1.webp',
+                'visible' => true,
+            ]);
 
         Unit::factory()
             ->count(3)

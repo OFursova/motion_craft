@@ -7,6 +7,7 @@ use App\Filament\Auth\UserAppRegistration;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -33,6 +34,13 @@ class AppPanelProvider extends PanelProvider
             ->passwordReset()
             ->emailVerification()
             ->profile()
+            ->userMenuItems([
+                MenuItem::make()
+                ->label('Admin panel')
+                ->icon('heroicon-o-cog-6-tooth')
+                ->url('/admin')
+                ->visible(fn(): bool => auth()->user()->is_admin)
+            ])
             ->topNavigation()
             ->brandLogo(asset('images/mc_logo_horizontal_transparent.png'))
             ->brandLogoHeight('4rem')

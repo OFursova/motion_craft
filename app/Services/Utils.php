@@ -8,6 +8,6 @@ class Utils
 {
     public static function isAdmin(?User $user = null): bool
     {
-        return in_array($user?->email, config('app.admins'));
+        return $user?->is_admin;
     }
 }

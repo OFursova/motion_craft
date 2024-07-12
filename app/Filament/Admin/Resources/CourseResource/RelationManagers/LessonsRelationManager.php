@@ -67,7 +67,10 @@ class LessonsRelationManager extends RelationManager
                     ->schema([
                         Forms\Components\Select::make('unit_id')
                             ->label(__('Unit'))
-                            ->options(fn() => Unit::select(['id', 'title'])->where('course_id', $this->ownerRecord?->id)->pluck('title', 'id'))
+                            ->options(fn() => Unit::select(['id', 'title'])
+                                ->where('course_id', $this->ownerRecord?->id)
+                                ->pluck('title', 'id')
+                            )
                             ->createOptionForm([
                                 Forms\Components\TextInput::make('title')
                                     ->translateLabel()

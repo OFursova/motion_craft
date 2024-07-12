@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
@@ -28,6 +29,12 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->userMenuItems([
+                MenuItem::make()
+                    ->label('App')
+                    ->icon('heroicon-s-computer-desktop')
+                    ->url('/app')
+            ])
             ->brandLogo(asset('images/mc_logo_horizontal_transparent.png'))
             ->brandLogoHeight('4rem')
             ->colors([
