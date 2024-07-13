@@ -15,17 +15,17 @@ class CategorySeeder extends Seeder
         Category::factory()
             ->count(11)
             ->sequence(
-                ['name' => 'After Effects'],
-                ['name' => 'Blender'],
-                ['name' => 'Cinema 4D'],
-                ['name' => 'VFX'],
-                ['name' => '2D'],
-                ['name' => '3D'],
-                ['name' => 'Псевдо 3D'],
-                ['name' => 'Проэкт'],
-                ['name' => 'Принципы анимации'],
-                ['name' => 'Скульптинг'],
-                ['name' => 'Советы'],
+                ['title' => 'After Effects'],
+                ['title' => 'Blender'],
+                ['title' => 'Cinema 4D'],
+                ['title' => 'VFX'],
+                ['title' => '2D'],
+                ['title' => '3D'],
+                ['title' => 'Псевдо 3D'],
+                ['title' => 'Проэкт'],
+                ['title' => 'Принципы анимации'],
+                ['title' => 'Скульптинг'],
+                ['title' => 'Советы'],
             )
             ->create();
     }

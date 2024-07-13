@@ -37,7 +37,7 @@ test('courses are listed', function () {
         ->assertCanRenderTableColumn('level')
         ->assertCanNotRenderTableColumn('free')
         ->assertCanRenderTableColumn('visible')
-        ->assertCanRenderTableColumn('categories.name')
+        ->assertCanRenderTableColumn('categories.title')
         ->assertCanRenderTableColumn('created_at');
 });
 
@@ -113,3 +113,7 @@ test('course lessons can be shown', function () {
         ->assertSuccessful()
         ->assertCanSeeTableRecords($course->lessons);
 });
+
+test('unit can be created and attached to a course', function () {})->todo();
+
+test('lesson can be created and attached to a course', function () {})->todo();

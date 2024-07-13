@@ -29,7 +29,7 @@ test('courses are listed for user', function () {
 
     $courses = Course::factory()
         ->count(3)
-        ->has(Category::factory()->state(['name' => 'Test category']))
+        ->has(Category::factory()->state(['title' => 'Test category']))
         ->create(['visible' => true]);
 
     $draftCourses = Course::factory()->count(2)->create(['visible' => false]);
@@ -61,7 +61,7 @@ test('user can see course details', function () {
     $user = User::factory()->create(['is_admin' => false]);
 
     $course = Course::factory()
-        ->has(Category::factory()->state(['name' => 'Test category']))
+        ->has(Category::factory()->state(['title' => 'Test category']))
         ->create(['visible' => false]);
 
     Unit::factory()

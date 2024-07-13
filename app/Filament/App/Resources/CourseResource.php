@@ -74,7 +74,7 @@ class CourseResource extends Resource
                             ->searchable(),
                         Tables\Columns\TextColumn::make('overview')
                             ->html(),
-                        Tables\Columns\TextColumn::make('categories.name')
+                        Tables\Columns\TextColumn::make('categories.title')
                             ->badge(),
                     ])->extraAttributes(['class' => 'justify-between']),
             ])
@@ -86,7 +86,7 @@ class CourseResource extends Resource
                 Tables\Filters\SelectFilter::make('level')
                     ->options(LevelEnum::class),
                 Tables\Filters\SelectFilter::make('category')
-                    ->relationship('categories', 'name')
+                    ->relationship('categories', 'title')
                     ->searchable()
                     ->preload(),
                 Tables\Filters\TernaryFilter::make('free'),
@@ -124,7 +124,7 @@ class CourseResource extends Resource
                                 ->hiddenLabel()
                                 ->maxWidth(MaxWidth::Small)
                                 ->html(),
-                            TextEntry::make('categories.name')
+                            TextEntry::make('categories.title')
                                 ->hiddenLabel()
                                 ->badge()
                         ])->grow(false),

@@ -3,11 +3,9 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Enums\LevelEnum;
-use App\Filament\Admin\Resources\CourseResource\Pages;
 use App\Filament\Admin\Resources\CourseResource\Pages\CreateCourse;
 use App\Filament\Admin\Resources\CourseResource\Pages\EditCourse;
 use App\Filament\Admin\Resources\CourseResource\Pages\ListCourses;
-use App\Filament\Admin\Resources\CourseResource\RelationManagers;
 use App\Filament\Admin\Resources\CourseResource\RelationManagers\LessonsRelationManager;
 use App\Filament\Admin\Resources\CourseResource\RelationManagers\UnitsRelationManager;
 use App\Models\Course;
@@ -15,7 +13,6 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -34,12 +31,31 @@ class CourseResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Textarea::make('title')
-                    ->translateLabel()
-                    ->required()
-                    ->string()
-                    ->maxLength(255)
-                    ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/'),
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Textarea::make('title')
+                            ->translateLabel()
+                            ->required()
+                            ->string()
+                            ->maxLength(255)
+                            ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/')
+                            ->live(onBlur: true),
+                        //->afterStateUpdated(function (string $operation, $state, Forms\Set $set) {
+                        //    if ($operation !== 'create') {
+                        //        return;
+                        //    }
+                        //    $set('slug', Str::slug($state));
+                        //}),
+                        Forms\Components\Textarea::make('overview')
+                            ->translateLabel()
+                            ->nullable()
+                            ->string()
+                            ->maxLength(255)
+                            ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/')
+                            ->columnSpan('full'),
+                    ])->columns(1)
+                    ->columnSpan('sm'),
+
                 Forms\Components\FileUpload::make('cover')
                     ->translateLabel()
                     ->directory('cover-images')
@@ -53,13 +69,7 @@ class CourseResource extends Resource
                         '1:1',
                     ])
                     ->downloadable(),
-                Forms\Components\Textarea::make('overview')
-                    ->translateLabel()
-                    ->nullable()
-                    ->string()
-                    ->maxLength(255)
-                    ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/')
-                    ->columnSpan('full'),
+
                 Forms\Components\RichEditor::make('description')
                     ->translateLabel()
                     ->nullable()
@@ -67,8 +77,7 @@ class CourseResource extends Resource
                     ->maxLength(5000)
                     ->fileAttachmentsDirectory('attachments')
                     ->columnSpan('full'),
-                Forms\Components\Fieldset::make('Settings')
-                    ->translateLabel()
+                Forms\Components\Group::make()
                     ->schema([
                         Forms\Components\Select::make('level')
                             ->translateLabel()
@@ -92,7 +101,7 @@ class CourseResource extends Resource
                         Forms\Components\CheckboxList::make('categories')
                             ->label('')
                             ->columns(3)
-                            ->relationship('categories', 'name'),
+                            ->relationship('categories', 'title'),
                     ])->columns(1)
                     ->columnSpan('sm'),
             ]);
@@ -113,7 +122,7 @@ class CourseResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('level')
                     ->translateLabel()
-                    ->formatStateUsing(fn($state) => __('courses.levels.'. $state->name))
+                    ->formatStateUsing(fn($state) => __('courses.levels.' . $state->name))
                     ->badge()
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('cover')
@@ -130,7 +139,7 @@ class CourseResource extends Resource
                     ->offIcon('heroicon-c-eye-slash')
                     ->onColor('success')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('categories.name')
+                Tables\Columns\TextColumn::make('categories.title')
                     ->translateLabel()
                     ->badge()
                     ->sortable()
@@ -159,7 +168,7 @@ class CourseResource extends Resource
                 Tables\Actions\DeleteAction::make()->iconButton(),
                 Tables\Actions\RestoreAction::make()->iconButton(),
                 //])->tooltip('Actions'),
-            ], )
+            ],)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
