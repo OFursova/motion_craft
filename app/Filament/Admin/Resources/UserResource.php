@@ -28,21 +28,31 @@ class UserResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->translateLabel()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->columnSpanFull(),
                         Forms\Components\TextInput::make('email')
                             ->email()
                             ->required(fn() => str_ends_with(request()->url(), 'create'))
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->columnSpanFull(),
                         Forms\Components\TextInput::make('password')
                             ->translateLabel()
                             ->password()
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(40)
+                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('ip')
+                            ->label('IP')
+                            ->ip()
+                            ->maxLength(15)
+                            ->default(null),
+                        Forms\Components\DateTimePicker::make('email_verified_at')
+                            ->translateLabel(),
                         Forms\Components\TextInput::make('customer_id')
                             ->translateLabel()
-                            ->maxLength(255)
+                            ->maxLength(40)
                             ->default(null),
-                    ]),
+                    ])->columns(2),
                 Forms\Components\Group::make()
                     ->schema([
                         Forms\Components\FileUpload::make('avatar_url')
@@ -59,13 +69,11 @@ class UserResource extends Resource
                                 '1:1',
                             ])
                             ->downloadable(),
-                        Forms\Components\TextInput::make('ip')
-                            ->maxLength(255)
-                            ->default(null),
-                        Forms\Components\DateTimePicker::make('email_verified_at')
-                            ->translateLabel(),
-                        Forms\Components\Toggle::make('is_admin')
-                            ->translateLabel(),
+                        Forms\Components\Section::make(__('Rights'))
+                            ->schema([
+                                Forms\Components\Toggle::make('is_admin')
+                                    ->translateLabel(),
+                            ])
                     ]),
             ]);
     }
@@ -77,23 +85,36 @@ class UserResource extends Resource
                 Tables\Columns\ImageColumn::make('avatar_url')
                     ->label('Avatar')
                     ->translateLabel()
+                    ->circular()
+                    ->defaultImageUrl(asset('/images/batman.png'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
                     ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('customer_id')
                     ->translateLabel()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('ip')
+                    ->label('IP')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('is_admin')
                     ->translateLabel()
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\IconColumn::make('subscription')
+                    ->translateLabel()
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-badge')
+                    ->falseIcon('heroicon-o-x-mark')
+                    ->toggleable(),
+//                TextColumn::make('users_exists')->exists([
+//                    'users' => fn (Builder $query) => $query->where('is_active', true),
+//                ]),
                 Tables\Columns\TextColumn::make('created_at')
                     ->translateLabel()
                     ->date('d-m-Y')

@@ -13,11 +13,11 @@ class StatsOverview extends BaseWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Users', User::count())
+            Stat::make(__('Users'), User::count())
                 ->description('Total users on the platform'),
-            Stat::make('Courses', Course::count())
+            Stat::make(__('Courses'), Course::count())
                 ->description('Total courses on the platform'),
-            Stat::make('Lessons', Lesson::count())
+            Stat::make(__('Lessons'), Lesson::count())
                 ->description('Total lessons on the platform'),
         ];
     }

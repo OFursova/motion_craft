@@ -5,13 +5,15 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Services\Utils;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     use HasFactory, Notifiable, SoftDeletes;
 
@@ -62,6 +64,15 @@ class User extends Authenticatable implements FilamentUser
             return Utils::isAdmin($this);
         }
 
-        return true;
+        if ($panel->getId() === 'app') {
+            return auth()->check();
+        }
+
+        return false;
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return Storage::url($this->avatar_url);
     }
 }

@@ -24,4 +24,15 @@ enum LevelEnum: string implements HasLabel, HasColor
             self::Advanced => 'info',
         };
     }
+
+    public static function getOptions(): array
+    {
+        $options = [];
+
+        foreach (self::cases() as $value) {
+            $options[$value->value] = __('courses.levels.'.$value->name);
+        }
+
+        return $options;
+    }
 }

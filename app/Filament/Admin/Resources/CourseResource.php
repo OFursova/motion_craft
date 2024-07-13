@@ -81,7 +81,7 @@ class CourseResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('level')
                             ->translateLabel()
-                            ->options(LevelEnum::class)
+                            ->options(LevelEnum::getOptions())
                             ->nullable(),
                         Forms\Components\Toggle::make('free')
                             ->translateLabel()
@@ -159,15 +159,14 @@ class CourseResource extends Resource
             ->defaultSort('id', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('level')
-                    ->options(LevelEnum::class),
+                    ->translateLabel()
+                    ->options(LevelEnum::getOptions()),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                //ActionGroup::make([
                 Tables\Actions\EditAction::make()->iconButton(),
                 Tables\Actions\DeleteAction::make()->iconButton(),
                 Tables\Actions\RestoreAction::make()->iconButton(),
-                //])->tooltip('Actions'),
             ],)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

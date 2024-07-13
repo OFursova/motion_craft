@@ -25,12 +25,24 @@ class CategoryResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->string()
-                    ->maxLength(255)
-                    ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/'),
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\TextInput::make('title')
+                            ->translateLabel()
+                            ->required()
+                            ->string()
+                            ->maxLength(255)
+                            ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/'),
+                        Forms\Components\Textarea::make('overview')
+                            ->translateLabel()
+                            ->nullable()
+                            ->string()
+                            ->maxLength(255)
+                            ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/')
+                            ->columnSpanFull(),
+                    ]),
                 Forms\Components\FileUpload::make('cover')
+                    ->translateLabel()
                     ->directory('cover-images')
                     ->image()
                     ->maxSize(1024)
@@ -44,12 +56,6 @@ class CategoryResource extends Resource
                     ->previewable()
                     ->openable()
                     ->downloadable(),
-                Forms\Components\Textarea::make('overview')
-                    ->nullable()
-                    ->string()
-                    ->maxLength(255)
-                    ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/')
-                    ->columnSpanFull(),
             ]);
     }
 
@@ -63,7 +69,7 @@ class CategoryResource extends Resource
                 Tables\Columns\ImageColumn::make('cover')
                     ->translateLabel()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('title')
                     ->translateLabel()
                     ->searchable()
                     ->sortable(),

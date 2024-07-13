@@ -25,7 +25,8 @@ class UnitsRelationManager extends RelationManager
                     ->required()
                     ->string()
                     ->maxLength(255)
-                    ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/'),
+                    ->notRegex('/&lt;|&gt;|&nbsp;|&amp;|[<>=]+/')
+                    ->columnSpanFull(),
                 Forms\Components\TextInput::make('position')
                     ->translateLabel()
                     ->integer()
@@ -84,6 +85,16 @@ class UnitsRelationManager extends RelationManager
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Unit');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Units');
     }
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string

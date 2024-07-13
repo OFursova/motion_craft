@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\App\Pages\Dashboard;
+use App\Filament\Auth\EditProfile;
 use App\Filament\Auth\UserAppRegistration;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -33,10 +34,10 @@ class AppPanelProvider extends PanelProvider
             ->registration(UserAppRegistration::class)
             ->passwordReset()
             ->emailVerification()
-            ->profile()
+            ->profile(EditProfile::class, isSimple: false)
             ->userMenuItems([
                 MenuItem::make()
-                ->label('Admin panel')
+                ->label(__('Admin panel'))
                 ->icon('heroicon-o-cog-6-tooth')
                 ->url('/admin')
                 ->visible(fn(): bool => auth()->user()->is_admin)

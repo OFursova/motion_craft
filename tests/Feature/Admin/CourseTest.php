@@ -113,7 +113,3 @@ test('course lessons can be shown', function () {
         ->assertSuccessful()
         ->assertCanSeeTableRecords($course->lessons);
 });
-
-test('unit can be created and attached to a course', function () {})->todo();
-
-test('lesson can be created and attached to a course', function () {})->todo();
