@@ -25,4 +25,5 @@ return [
     'Archived' => 'Archived',
     'Free' => 'Free',
     'Visible' => 'Visible',
+    'watched' => 'Lesson is watched',
 ];

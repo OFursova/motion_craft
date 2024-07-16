@@ -22,6 +22,7 @@ class LessonFactory extends Factory
             'type' => fake()->randomElement(LessonTypeEnum::cases()),
             'overview' => fake()->sentence(),
             'url' => fake()->url,
+            'stream_id' => fake()->text(11),
             'content' => rand(0,3) > 2 ? fake()->randomHtml() : null,
             'duration' => fake()->randomDigitNotNull(),
             'free' => fake()->boolean,

@@ -156,7 +156,7 @@ class CourseResource extends Resource
                                             ->button()
                                             ->icon('heroicon-o-play-circle')
                                             ->visible(true)
-                                            ->action(fn (Course $course) => $this->redirectRoute('courses.episodes.show', ['course' => $course]))
+                                            ->url(Pages\WatchCourse::getUrl(['record' => $infolist->getRecord()]))
                                     ]),
                                 ]),
                             Section::make('')
@@ -200,6 +200,7 @@ class CourseResource extends Resource
         return [
             'index' => Pages\ListCourses::route('/'),
             'view' => Pages\ViewCourse::route('/{record}'),
+            'watch' => Pages\WatchCourse::route('{record}/watch')
         ];
     }
 

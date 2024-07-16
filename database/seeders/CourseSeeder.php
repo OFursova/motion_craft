@@ -33,7 +33,7 @@ class CourseSeeder extends Seeder
 
         Unit::factory()
             ->count(3)
-            ->hasAttached(Lesson::factory(rand(3,5)), ['course_id' => $course->id])
+            ->hasAttached(Lesson::factory(rand(3,5))->state(['stream_id' => 'gWwlnjE_xJE']), ['course_id' => $course->id])
             ->create(['course_id' => $course->id]);
     }
 }

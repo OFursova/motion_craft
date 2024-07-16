@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('title')->nullable();
             $table->string('overview')->nullable();
             $table->string('url')->nullable();
+            $table->string('stream_id')->nullable();
             $table->text('content')->nullable();
             $table->unsignedBigInteger('duration')->default(0);
             $table->boolean('free')->default(false);
@@ -29,6 +30,11 @@ return new class extends Migration
             $table->foreignId('lesson_id')->constrained()->cascadeOnDelete();
             $table->foreignId('unit_id')->nullable()->constrained()->nullOnDelete();
             $table->bigInteger('position')->nullable()->default(0);
+        });
+
+        Schema::create('lesson_user', function (Blueprint $table) {
+            $table->foreignId('lesson_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
         });
     }
 

@@ -23,6 +23,7 @@ class Lesson extends Model
         'type',
         'overview',
         'url',
+        'stream_id',
         'content',
         'duration',
         'free',
