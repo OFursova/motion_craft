@@ -12,6 +12,7 @@ export default {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
+        './resources/**/*.{js,cjs,mjs,ts,vue,scss,css}'
     ],
 
     theme: {

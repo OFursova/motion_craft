@@ -91,17 +91,20 @@ class WatchCourse extends Page
                             ->weight(fn(Lesson $episode) => $episode->id === 1
                                 ? 'font-bold'
                                 : 'font-base'
-                            ),
+                            )->columnSpan(5),
                         TextEntry::make('duration')
                             ->hiddenLabel()
                             ->formatStateUsing(fn($state) => DurationEnum::forHumans($state))
-                            ->icon('heroicon-o-clock'),
+                            ->icon('heroicon-o-clock')
+                            ->size(TextEntry\TextEntrySize::ExtraSmall)
+                            ->columnSpan(2),
                         IconEntry::make('title')
                             ->hiddenLabel()
                             ->icon('heroicon-s-check-circle')
                             ->color('success')
-                        //->visible(fn (Lesson $episode): bool => $this->watchedEpisodes->contains('id', $episode->id))
-                    ]),
+                            //->visible(fn (Lesson $episode): bool => $this->watchedEpisodes->contains('id', $episode->id))
+                            ->columnSpan(1),
+                    ])->columns(8),
             ]);
     }
 

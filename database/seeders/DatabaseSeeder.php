@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Admin',
             'email' => 'admin@mail.com',
+            'avatar_url' => 'avatars/01J2PA661GDR1DQJJVM78ZK8D2.jpg',
             'is_admin' => true,
         ]);
 

@@ -1,5 +1,5 @@
 <x-dynamic-component :component="$getEntryWrapperView()" :entry="$entry">
-    <div class="relative" style="padding-bottom: 56.25%; height: 0; overflow: hidden;">
+    <div class="relative pb-[56.25%]">
         <iframe
             src="https://www.youtube.com/embed/{{ $getState() }}?enablejsapi=1&rel=0&modestbranding=1"
             id="player"
