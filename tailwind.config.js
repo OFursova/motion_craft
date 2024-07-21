@@ -19,9 +19,16 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                'montserrat': ['Montserrat', ...defaultTheme.fontFamily.sans],
             },
             minHeight: {
                 '80': '20rem'
+            },
+            colors: {
+                'lightgray': '#f8f9fb',
+                'mildgray': '#f2f3f5',
+                'mc-green': '#26960f',
+                'mc-purple': '#6a62e1',
             }
         },
     },

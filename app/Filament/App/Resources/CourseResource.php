@@ -40,9 +40,16 @@ class CourseResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
+    protected static int $globalSearchResultsLimit = 20;
+
     public static function getGloballySearchableAttributes(): array
     {
         return ['title', 'categories.name'];
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with(['categories:id,name']);
     }
 
     public static function form(Form $form): Form
