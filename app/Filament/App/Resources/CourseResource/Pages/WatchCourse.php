@@ -17,6 +17,7 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
 use Filament\Support\Enums\MaxWidth;
+use Livewire\Attributes\On;
 
 class WatchCourse extends Page
 {
@@ -116,5 +117,21 @@ class WatchCourse extends Page
     public function getHeading(): string
     {
         return '';
+    }
+
+    #[On('lesson-ended')]
+    public function onLessonEnded(Lesson $lesson): void
+    {
+        auth()->user()->lessons()->syncWithPivotValues($lesson->id,
+            [
+                'course_id' => $this->record->id,
+                'completed_at' => now()
+            ],
+            false);
+
+        $this->lesson = $this->record->lessons
+            //->where('position', $lesson->position + 1)
+                ->where('id', 7)
+            ->first() ?? $lesson;
     }
 }

@@ -37,8 +37,8 @@
         if (event.data == YT.PlayerState.ENDED) {
             console.log('Video has ended');
 
-            $wire.dispatch('episode-ended', {
-                episode: '{{ $getRecord()->id }}'
+            $wire.dispatch('lesson-ended', {
+                lesson: '{{ $getRecord()->id }}'
             });
         }
     }

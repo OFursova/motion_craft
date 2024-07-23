@@ -8,7 +8,6 @@ use App\Filament\App\Resources\CourseResource\Pages;
 use App\Filament\App\Resources\CourseResource\RelationManagers;
 use App\Filament\Entries\CurriculumEntry;
 use App\Models\Course;
-use App\Models\Episode;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Actions;
@@ -157,9 +156,9 @@ class CourseResource extends Resource
                                     // has been started flag
                                     Actions::make([
                                         Actions\Action::make('watch')
-//                                            ->label(fn (Course $course) => auth()->user()->watchedEpisodes()->where('course_id', $course->id)->exists()
-//                                                ? 'Continue watching'
-//                                                : 'Start watching')
+                                            ->label(fn (Course $course) => auth()->user()->lessons()->where('course_id', $course->id)->exists()
+                                                ? 'Continue watching'
+                                                : 'Start watching')
                                             ->button()
                                             ->icon('heroicon-o-play-circle')
                                             ->visible(true)
