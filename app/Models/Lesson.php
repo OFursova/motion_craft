@@ -44,7 +44,7 @@ class Lesson extends Model
     protected function durationInMinutes(): Attribute
     {
         return Attribute::make(
-            get: fn () => Converter::durationInMinutes($this->duration),
+            get: fn () => $this->duration ? Converter::durationInMinutes($this->duration) : '00:00:00',
         );
     }
 
@@ -60,5 +60,12 @@ class Lesson extends Model
         return $this->belongsToMany(Unit::class, 'course_lesson', 'lesson_id', 'unit_id')
             ->withPivot(['position', 'course_id'])
             ->orderBy('course_lesson.position');
+    }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot(['course_id', 'completed_at'])
+            ->orderBy('lesson_user.completed_at');
     }
 }

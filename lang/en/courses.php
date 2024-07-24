@@ -23,6 +23,9 @@ return [
         'File' => 'File'
     ],
     'Archived' => 'Archived',
+    'not_started' => 'Not started',
+    'finished' => 'Finished',
+    'finished_all' => 'Finished all',
     'Free' => 'Free',
     'Visible' => 'Visible',
     'watched' => 'Lesson is watched',

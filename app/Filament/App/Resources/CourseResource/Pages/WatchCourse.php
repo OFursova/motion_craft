@@ -4,11 +4,13 @@ namespace App\Filament\App\Resources\CourseResource\Pages;
 
 use App\Enums\DurationEnum;
 use App\Filament\App\Resources\CourseResource;
+use App\Filament\Entries\PlayerListEntry;
 use App\Infolists\Components\VideoPlayerEntry;
 use App\Models\Course;
 use App\Models\Episode;
 use App\Models\Lesson;
 use Filament\Actions\Action;
+use Filament\Infolists\Components\Actions;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section;
@@ -17,6 +19,9 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
 use Filament\Support\Enums\MaxWidth;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Livewire\Attributes\On;
 
 class WatchCourse extends Page
@@ -32,7 +37,6 @@ class WatchCourse extends Page
     public function mount(int|string $record): void
     {
         $this->record = $this->resolveRecord($record);
-        $this->record->loadMissing('lessons');
 
         $this->lesson = $this->record->lessons
             ->where('id', request()->query('lesson'))
@@ -75,38 +79,7 @@ class WatchCourse extends Page
     {
         return $infolist
             ->record($this->record)
-            ->schema([
-                RepeatableEntry::make('lessons')
-                    ->hiddenLabel()
-                    ->schema([
-                        TextEntry::make('title')
-                            ->hiddenLabel()
-                            ->icon(fn(Lesson $episode) => $episode->id === 1
-                                ? 'heroicon-s-play-circle'
-                                : 'heroicon-o-play-circle'
-                            )
-                            ->iconColor(fn(Lesson $episode) => $episode->id === 1
-                                ? 'success'
-                                : 'gray'
-                            )
-                            ->weight(fn(Lesson $episode) => $episode->id === 1
-                                ? 'font-bold'
-                                : 'font-base'
-                            )->columnSpan(5),
-                        TextEntry::make('duration')
-                            ->hiddenLabel()
-                            ->formatStateUsing(fn($state) => DurationEnum::forHumans($state))
-                            ->icon('heroicon-o-clock')
-                            ->size(TextEntry\TextEntrySize::ExtraSmall)
-                            ->columnSpan(2),
-                        IconEntry::make('title')
-                            ->hiddenLabel()
-                            ->icon('heroicon-s-check-circle')
-                            ->color('success')
-                            //->visible(fn (Lesson $episode): bool => $this->watchedEpisodes->contains('id', $episode->id))
-                            ->columnSpan(1),
-                    ])->columns(8),
-            ]);
+            ->schema(PlayerListEntry::schema($infolist->getRecord(), $this->lesson));
     }
 
     public function getMaxContentWidth(): MaxWidth
@@ -129,9 +102,13 @@ class WatchCourse extends Page
             ],
             false);
 
+        $currentLessonPosition = $this->record->lessons
+            ->where('id', $lesson->id)
+            ->first()
+            ->position;
+
         $this->lesson = $this->record->lessons
-            //->where('position', $lesson->position + 1)
-                ->where('id', 7)
+            ->where('position', $currentLessonPosition + 1)
             ->first() ?? $lesson;
     }
 }

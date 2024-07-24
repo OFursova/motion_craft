@@ -12,6 +12,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Actions;
 use Filament\Infolists\Components\Actions\Action;
+use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section;
@@ -68,7 +69,7 @@ class CourseResource extends Resource
                     ->schema([
                         Tables\Columns\TextColumn::make('level')
                             ->translateLabel()
-                            ->formatStateUsing(fn($state) => __('courses.levels.'. $state->name))
+                            ->formatStateUsing(fn($state) => __('courses.levels.' . $state->name))
                             ->badge(),
                         Tables\Columns\ImageColumn::make('cover')
                             ->defaultImageUrl(asset('storage/cover-images/cover_img_1.webp'))
@@ -108,6 +109,9 @@ class CourseResource extends Resource
     {
         $infolist->getRecord()
             ->loadCount(['lessons', 'units'])
+            ->loadCount(['lessons as finished_lessons' => fn (Builder $query) => $query
+                    ->whereRelation('users', 'id', '=', auth()->id()
+                )])
             ->loadSum('lessons', 'duration');
 
         return $infolist
@@ -146,19 +150,34 @@ class CourseResource extends Resource
                                     TextEntry::make('overview')
                                         ->hiddenLabel()
                                         ->columnSpanFull(),
-                                    TextEntry::make('updated_at')
-                                        ->hiddenLabel()
-                                        ->badge()
-                                        ->prefix(__('Last updated') . ': ')
-                                        ->formatStateUsing(fn($state) => $state->isoFormat('Do MMMM Y'))
-                                        ->alignRight()
-                                        ->lineClamp(2),
-                                    // has been started flag
+                                    Group::make()
+                                        ->schema([
+                                            TextEntry::make('finished_lessons')
+                                                ->hiddenLabel()
+                                                ->formatStateUsing(fn($state) => match ($state) {
+                                                    0 => __('courses.not_started'),
+                                                    $infolist->getRecord()->lessons_count => __('courses.finished_all'),
+                                                    default => sprintf('%s %s %s', __('courses.finished'), $state, trans_choice('courses.lessons', $state))
+                                                })
+                                                ->icon('heroicon-c-check')
+                                                ->iconColor(Color::Lime)
+                                                ->columnSpan(2),
+                                            TextEntry::make('')
+                                                ->columnSpan(1),
+                                            TextEntry::make('updated_at')
+                                                ->hiddenLabel()
+                                                ->badge()
+                                                ->prefix(__('Last updated') . ': ')
+                                                ->formatStateUsing(fn($state) => $state->isoFormat('Do MMMM Y'))
+                                                ->alignRight()
+                                                ->columnSpan(2),
+                                        ])->columns(5),
+
                                     Actions::make([
                                         Actions\Action::make('watch')
-                                            ->label(fn (Course $course) => auth()->user()->lessons()->where('course_id', $course->id)->exists()
-                                                ? 'Continue watching'
-                                                : 'Start watching')
+                                            ->label(fn(Course $course) => auth()->user()->lessons()->where('course_id', $course->id)->exists()
+                                                ? __('Continue watching')
+                                                : __('Start watching'))
                                             ->button()
                                             ->icon('heroicon-o-play-circle')
                                             ->visible(true)
@@ -210,11 +229,11 @@ class CourseResource extends Resource
         ];
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        return Cache::remember('course_badge', 3 * 60 * 60,
-            fn() => static::getModel()::where('created_at', '<', today()->subWeek())->exists() ? 'NEW' : null);
-    }
+//    public static function getNavigationBadge(): ?string
+//    {
+//        return Cache::remember('course_badge', 3 * 60 * 60,
+//            fn() => static::getModel()::where('created_at', '<', today()->subWeek())->exists() ? 'NEW' : null);
+//    }
 
     public static function getModelLabel(): string
     {
