@@ -35,30 +35,7 @@ final class CurriculumEntry
         return [
             RepeatableEntry::make('lessons')
                 ->hiddenLabel()
-                ->schema([
-                    TextEntry::make('type')
-                        ->hiddenLabel()
-                        ->badge()
-                        ->formatStateUsing(fn($state) => __('courses.types.' . $state->name))
-                        ->columnSpan(2),
-                    TextEntry::make('title')
-                        ->hiddenLabel()
-                        ->url(fn(Lesson $lesson) => WatchCourse::getUrl(['record' => $course, 'lesson' => $lesson->id]))
-                        ->columnSpan(7),
-                    TextEntry::make('duration')
-                        ->hiddenLabel()
-                        ->formatStateUsing(fn($state) => DurationEnum::forHumans($state, true))
-                        ->icon('heroicon-o-clock')
-                        ->columnSpan(2),
-                    IconEntry::make('watched')
-                        ->hiddenLabel()
-                        ->tooltip(__('courses.watched'))
-                        ->boolean()
-                        ->default(fn (Lesson $lesson) => (bool) $lesson->completed_at)
-                        ->trueIcon('heroicon-o-check-badge')
-                        ->falseIcon('heroicon-o-play')
-                        ->falseColor(Color::Indigo),
-                ])
+                ->schema(self::lessonsSchema($course))
                 ->columns(12),
         ];
     }
@@ -86,32 +63,38 @@ final class CurriculumEntry
                         ->weight('font-bold'),
                     RepeatableEntry::make('lessons')
                         ->hiddenLabel()
-                        ->schema([
-                            TextEntry::make('type')
-                                ->hiddenLabel()
-                                ->badge()
-                                ->formatStateUsing(fn($state) => __('courses.types.' . $state->name))
-                                ->columnSpan(2),
-                            TextEntry::make('title')
-                                ->hiddenLabel()
-                                ->url(fn(Lesson $lesson) => WatchCourse::getUrl(['record' => $course, 'lesson' => $lesson->id ?? 1]))
-                                ->columnSpan(7),
-                            TextEntry::make('duration')
-                                ->hiddenLabel()
-                                ->formatStateUsing(fn($state) => DurationEnum::forHumans($state, true))
-                                ->icon('heroicon-o-clock')
-                                ->columnSpan(2),
-                            IconEntry::make('icon')
-                                ->hiddenLabel()
-                                ->tooltip(__('courses.watched'))
-                                ->boolean()
-                                ->default(fn (Lesson $lesson) => (bool) $lesson->completed_at)
-                                ->trueIcon('heroicon-o-check-badge')
-                                ->falseIcon('heroicon-o-play')
-                                ->falseColor(Color::Indigo),
-                        ])->columns(12),
+                        ->schema(self::lessonsSchema($course))
+                        ->columns(12),
                 ])->contained(false)
                 ->columns(1),
+        ];
+    }
+
+    public static function lessonsSchema(?Model $course): array
+    {
+        return [
+            IconEntry::make('type')
+                ->hiddenLabel()
+                ->tooltip(fn($state) => __('courses.types.' . $state->name))
+                ->size(IconEntry\IconEntrySize::ExtraLarge)
+                ->columnSpan(1),
+            TextEntry::make('title')
+                ->hiddenLabel()
+                ->url(fn(Lesson $lesson) => WatchCourse::getUrl(['record' => $course, 'lesson' => $lesson->id ?? 1]))
+                ->columnSpan(7),
+            TextEntry::make('duration')
+                ->hiddenLabel()
+                ->formatStateUsing(fn($state) => DurationEnum::forHumans($state, true))
+                ->icon('heroicon-o-clock')
+                ->columnSpan(3),
+            IconEntry::make('icon')
+                ->hiddenLabel()
+                ->tooltip(__('courses.watched'))
+                ->boolean()
+                ->default(fn (Lesson $lesson) => (bool) $lesson->completed_at)
+                ->trueIcon('heroicon-o-check-badge')
+                ->falseIcon('heroicon-o-play')
+                ->falseColor(Color::Indigo),
         ];
     }
 }

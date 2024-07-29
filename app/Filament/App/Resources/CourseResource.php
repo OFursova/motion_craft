@@ -67,23 +67,43 @@ class CourseResource extends Resource
                 Grid::make()
                     ->columns(1)
                     ->schema([
-                        Tables\Columns\TextColumn::make('level')
-                            ->translateLabel()
-                            ->formatStateUsing(fn($state) => __('courses.levels.' . $state->name))
-                            ->badge(),
+                        Grid::make()
+                            ->schema([
+                                Tables\Columns\TextColumn::make('level')
+                                    ->translateLabel()
+                                    ->formatStateUsing(fn($state) => __('courses.levels.' . $state->name))
+                                    ->badge()
+                                    ->icon('heroicon-o-chart-bar'),
+                                Tables\Columns\TextColumn::make('lessons_count')
+                                    ->formatStateUsing(fn($state) => $state . ' ' . trans_choice('courses.lessons', $state))
+                                    ->counts('lessons')
+                                    ->icon('heroicon-o-book-open'),
+                                Tables\Columns\TextColumn::make('lessons_sum_duration')
+                                    ->formatStateUsing(fn($state) => DurationEnum::forHumans($state, true) ?: __('0m'))
+                                    ->sum('lessons', 'duration')
+                                    ->icon('heroicon-o-clock'),
+                            ])
+                            ->columns(3)
+                            ->columnSpanFull(),
                         Tables\Columns\ImageColumn::make('cover')
                             ->defaultImageUrl(asset('storage/cover-images/cover_img_1.webp'))
                             ->height(200)
                             ->extraImgAttributes(['class' => 'w-full rounded']),
-                        Tables\Columns\TextColumn::make('title')
-                            ->weight(FontWeight::Bold)
-                            ->size(Tables\Columns\TextColumn\TextColumnSize::Large)
-                            ->searchable(),
-                        Tables\Columns\TextColumn::make('overview')
-                            ->html(),
-                        Tables\Columns\TextColumn::make('categories.title')
-                            ->badge(),
-                    ])->extraAttributes(['class' => 'justify-between']),
+                        Grid::make()
+                            ->schema([
+                                Tables\Columns\TextColumn::make('title')
+                                    ->weight(FontWeight::Bold)
+                                    ->size(Tables\Columns\TextColumn\TextColumnSize::Large)
+                                    ->searchable(),
+                                Tables\Columns\TextColumn::make('overview')
+                                    ->html(),
+                                Tables\Columns\TextColumn::make('categories.title')
+                                    ->badge(),
+                            ])
+                            //->extraAttributes(['class' => 'h-max min-h-40'])
+                            ->columns(1)
+                            ->columnSpanFull(),
+                    ]),
             ])
             ->contentGrid(['md' => 2, 'xl' => 3])
             ->paginationPageOptions([9, 30, 60])
@@ -100,8 +120,10 @@ class CourseResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
+                    ->label(__('Watch'))
                     ->button()
                     ->color(Color::Lime),
+                // Add to Watchlist
             ]);
     }
 
@@ -109,8 +131,8 @@ class CourseResource extends Resource
     {
         $infolist->getRecord()
             ->loadCount(['lessons', 'units'])
-            ->loadCount(['lessons as finished_lessons' => fn (Builder $query) => $query
-                    ->whereRelation('users', 'id', '=', auth()->id()
+            ->loadCount(['lessons as finished_lessons' => fn(Builder $query) => $query
+                ->whereRelation('users', 'id', '=', auth()->id()
                 )])
             ->loadSum('lessons', 'duration');
 

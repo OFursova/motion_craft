@@ -3,13 +3,17 @@
 namespace App\Filament\Entries;
 
 use App\Enums\DurationEnum;
+use App\Filament\App\Resources\CourseResource\Pages\ViewCourse;
 use App\Filament\App\Resources\CourseResource\Pages\WatchCourse;
 use App\Models\Course;
 use App\Models\Lesson;
+use Filament\Infolists\Components\Actions;
+use Filament\Infolists\Components\Actions\Action;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Alignment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -34,41 +38,15 @@ final class PlayerListEntry
         ]);
 
         return [
+            Actions::make([
+                Action::make(__('Back'))
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->url(ViewCourse::getUrl(['record' => $course])),
+            ])->alignment(Alignment::Right),
             RepeatableEntry::make('lessons')
                 ->hiddenLabel()
-                ->schema([
-                    TextEntry::make('title')
-                        ->hiddenLabel()
-                        ->icon(fn(Lesson $lesson) => $lesson->id === $currentLesson->id
-                            ? 'heroicon-s-play-circle'
-                            : 'heroicon-o-play-circle'
-                        )
-                        ->iconColor(fn(Lesson $lesson) => $lesson->id === $currentLesson->id
-                            ? 'success'
-                            : 'gray'
-                        )
-                        ->weight(fn(Lesson $lesson) => $lesson->id === $currentLesson->id
-                            ? 'font-bold'
-                            : 'font-base'
-                        )
-                        ->url(fn (Lesson $lesson) => route('filament.app.resources.courses.watch', [
-                            $course->id,
-                            'lesson' => $lesson->id,
-                        ]))
-                        ->columnSpan(5),
-                    TextEntry::make('duration')
-                        ->hiddenLabel()
-                        ->formatStateUsing(fn($state) => DurationEnum::forHumans($state, true))
-                        ->icon('heroicon-o-clock')
-                        ->size(TextEntry\TextEntrySize::Small)
-                        ->columnSpan(2),
-                    IconEntry::make('completed_at')
-                        ->hiddenLabel()
-                        ->icon('heroicon-s-check-circle')
-                        ->color('success')
-                        ->visible(fn(Lesson $lesson): bool => (bool) $lesson->completed_at)
-                        ->columnSpan(1),
-                ])->columns(8),
+                ->schema(self::lessonsSchema($course, $currentLesson))
+                ->columns(12),
         ];
     }
 
@@ -95,41 +73,47 @@ final class PlayerListEntry
                         ->weight('font-bold'),
                     RepeatableEntry::make('lessons')
                         ->hiddenLabel()
-                        ->schema([
-                            TextEntry::make('title')
-                                ->hiddenLabel()
-                                ->icon(fn(Lesson $lesson) => $lesson->id === $currentLesson->id
-                                    ? 'heroicon-s-play-circle'
-                                    : 'heroicon-o-play-circle'
-                                )
-                                ->iconColor(fn(Lesson $lesson) => $lesson->id === $currentLesson->id
-                                    ? 'success'
-                                    : 'gray'
-                                )
-                                ->weight(fn(Lesson $lesson) => $lesson->id === $currentLesson->id
-                                    ? 'font-bold'
-                                    : 'font-base'
-                                )
-                                ->url(fn (Lesson $lesson) => route('filament.app.resources.courses.watch', [
-                                    $course->id,
-                                    'lesson' => $lesson->id,
-                                ]))
-                                ->columnSpan(5),
-                            TextEntry::make('duration')
-                                ->hiddenLabel()
-                                ->formatStateUsing(fn($state) => DurationEnum::forHumans($state, true))
-                                ->icon('heroicon-o-clock')
-                                ->size(TextEntry\TextEntrySize::Small)
-                                ->columnSpan(2),
-                            IconEntry::make('completed_at')
-                                ->hiddenLabel()
-                                ->icon('heroicon-s-check-circle')
-                                ->color('success')
-                                ->visible(fn(Lesson $lesson): bool => (bool) $lesson->completed_at)
-                                ->columnSpan(1),
-                        ])->columns(8),
+                        ->schema(self::lessonsSchema($course, $currentLesson))
+                        ->columns(12),
                 ])->contained(false)
                 ->columns(1),
+        ];
+    }
+
+    public static function lessonsSchema(Course $course, Lesson $currentLesson): array
+    {
+        return [
+            IconEntry::make('type')
+                ->hiddenLabel()
+                ->color(fn (Lesson $lesson) => $lesson->id === $currentLesson->id
+                    ? 'success'
+                    : 'gray'
+                )
+                ->icon(function (Lesson $lesson) {
+                    if ($lesson->completed_at) {
+                        return 'heroicon-o-check-circle';
+                    }
+                })
+                ->tooltip(fn($state) => __('courses.types.' . $state->name))
+                ->size(IconEntry\IconEntrySize::ExtraLarge)
+                ->columnSpan(1),
+            TextEntry::make('title')
+                ->hiddenLabel()
+                ->weight(fn (Lesson $lesson) => $lesson->id === $currentLesson->id
+                    ? 'font-bold'
+                    : 'font-base'
+                )
+                ->url(fn (Lesson $lesson) => route('filament.app.resources.courses.watch', [
+                    $course->id,
+                    'lesson' => $lesson->id,
+                ]))
+                ->columnSpan(8),
+            TextEntry::make('duration')
+                ->hiddenLabel()
+                ->formatStateUsing(fn ($state) => DurationEnum::forHumans($state, true))
+                ->icon('heroicon-o-clock')
+                ->size(TextEntry\TextEntrySize::Small)
+                ->columnSpan(3),
         ];
     }
 }

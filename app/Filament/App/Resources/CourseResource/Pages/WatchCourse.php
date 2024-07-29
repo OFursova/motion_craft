@@ -2,26 +2,18 @@
 
 namespace App\Filament\App\Resources\CourseResource\Pages;
 
-use App\Enums\DurationEnum;
 use App\Filament\App\Resources\CourseResource;
 use App\Filament\Entries\PlayerListEntry;
 use App\Infolists\Components\VideoPlayerEntry;
-use App\Models\Course;
 use App\Models\Episode;
 use App\Models\Lesson;
 use Filament\Actions\Action;
-use Filament\Infolists\Components\Actions;
-use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
 use Filament\Support\Enums\MaxWidth;
-use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Livewire\Attributes\On;
 
 class WatchCourse extends Page
