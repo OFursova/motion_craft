@@ -167,6 +167,12 @@ class CourseResource extends Resource
                 Tables\Actions\EditAction::make()->iconButton(),
                 Tables\Actions\DeleteAction::make()->iconButton(),
                 Tables\Actions\RestoreAction::make()->iconButton(),
+                Tables\Actions\ReplicateAction::make()
+                    ->iconButton()
+                    ->excludeAttributes(['slug', 'created_at', 'updated_at', 'deleted_at'])
+                    ->beforeReplicaSaved(function(Course $replica): void {
+                        $replica->title = '[NEW] '.$replica->title;
+                    }),
             ],)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

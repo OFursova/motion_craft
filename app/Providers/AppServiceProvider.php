@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use Filament\Facades\Filament;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
 

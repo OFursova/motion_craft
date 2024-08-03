@@ -31,7 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->userMenuItems([
                 MenuItem::make()
-                    ->label('App')
+                    ->label(__('App'))
                     ->icon('heroicon-s-computer-desktop')
                     ->url('/app')
             ])
@@ -69,7 +69,7 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->viteTheme('resources/css/filament/theme.css')
+            ->viteTheme('resources/css/filament/app/theme.css')
             ->spa();
     }
 }

@@ -8,28 +8,25 @@ use App\Filament\App\Resources\CourseResource\Pages;
 use App\Filament\App\Resources\CourseResource\RelationManagers;
 use App\Filament\Entries\CurriculumEntry;
 use App\Models\Course;
-use Filament\Forms;
+use App\Services\Converter;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Actions;
 use Filament\Infolists\Components\Actions\Action;
 use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\ImageEntry;
-use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Split;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
-use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
+use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Columns\Layout\Grid;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class CourseResource extends Resource
@@ -73,15 +70,17 @@ class CourseResource extends Resource
                                     ->translateLabel()
                                     ->formatStateUsing(fn($state) => __('courses.levels.' . $state->name))
                                     ->badge()
+                                    ->color(Color::Zinc)
                                     ->icon('heroicon-o-chart-bar'),
+                                Tables\Columns\TextColumn::make('lessons_sum_duration')
+                                    ->formatStateUsing(fn($state) => Converter::durationInMinutes($state))
+                                    ->sum('lessons', 'duration')
+                                    ->extraAttributes(['class' => 'pl-6'])
+                                    ->icon('heroicon-o-clock'),
                                 Tables\Columns\TextColumn::make('lessons_count')
                                     ->formatStateUsing(fn($state) => $state . ' ' . trans_choice('courses.lessons', $state))
                                     ->counts('lessons')
                                     ->icon('heroicon-o-book-open'),
-                                Tables\Columns\TextColumn::make('lessons_sum_duration')
-                                    ->formatStateUsing(fn($state) => DurationEnum::forHumans($state, true) ?: __('0m'))
-                                    ->sum('lessons', 'duration')
-                                    ->icon('heroicon-o-clock'),
                             ])
                             ->columns(3)
                             ->columnSpanFull(),
@@ -100,7 +99,7 @@ class CourseResource extends Resource
                                 Tables\Columns\TextColumn::make('categories.title')
                                     ->badge(),
                             ])
-                            //->extraAttributes(['class' => 'h-max min-h-40'])
+                            ->extraAttributes(['class' => 'min-h-48'])
                             ->columns(1)
                             ->columnSpanFull(),
                     ]),
@@ -111,19 +110,32 @@ class CourseResource extends Resource
             ->modifyQueryUsing(fn(Builder $query): Builder => $query->visible())
             ->filters([
                 Tables\Filters\SelectFilter::make('level')
-                    ->options(LevelEnum::class),
+                    ->translateLabel()
+                    ->options(LevelEnum::getOptions()),
                 Tables\Filters\SelectFilter::make('category')
+                    ->translateLabel()
                     ->relationship('categories', 'title')
                     ->searchable()
                     ->preload(),
-                Tables\Filters\TernaryFilter::make('free'),
+                Tables\Filters\TernaryFilter::make('free')
+                    ->translateLabel(),
             ])
             ->actions([
+                TableAction::make('Watchlist')
+                    ->hiddenLabel()
+                    ->button()
+                    ->tooltip(__('Add to Watchlist'))
+                    ->icon('heroicon-c-plus'),
+                TableAction::make(__('Purchase'))
+                    ->button()
+                    ->visible(false)
+                    ->icon('heroicon-s-credit-card')
+                    ->color(Color::Lime),
                 Tables\Actions\ViewAction::make()
                     ->label(__('Watch'))
                     ->button()
+                    ->visible(true)
                     ->color(Color::Lime),
-                // Add to Watchlist
             ]);
     }
 
@@ -251,11 +263,10 @@ class CourseResource extends Resource
         ];
     }
 
-//    public static function getNavigationBadge(): ?string
-//    {
-//        return Cache::remember('course_badge', 3 * 60 * 60,
-//            fn() => static::getModel()::where('created_at', '<', today()->subWeek())->exists() ? 'NEW' : null);
-//    }
+    public static function getNavigationBadge(): ?string
+    {
+        return Cache::get('course_badge') ? 'NEW' : null;
+    }
 
     public static function getModelLabel(): string
     {
@@ -263,6 +274,11 @@ class CourseResource extends Resource
     }
 
     public static function getPluralModelLabel(): string
+    {
+        return __('All Courses');
+    }
+
+    public static function getNavigationLabel(): string
     {
         return __('Courses');
     }

@@ -29,7 +29,9 @@ export default {
                 'mildgray': '#f2f3f5',
                 'mc-green': '#26960f',
                 'mc-purple': '#6a62e1',
-                'mc-yellow': '#fec106'
+                'mc-yellow': '#fec106',
+                'mc-lightgreen': '#b3df72',
+                'mc-lightpurple': '#9f8fef'
             }
         },
     },

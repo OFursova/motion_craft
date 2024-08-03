@@ -9,11 +9,8 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\MenuItem;
-use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Assets\Css;
-use Filament\Support\Assets\Js;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -48,10 +45,11 @@ class AppPanelProvider extends PanelProvider
             ->brandLogo(asset('images/mc_logo_horizontal_transparent.png'))
             ->brandLogoHeight('4rem')
             ->colors([
-                'primary' => Color::Emerald,
+                'primary' => Color::Pink,
             ])
             ->font('Montserrat')
             ->favicon(asset('images/mc_logo.png'))
+            ->breadcrumbs(false)
             ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\\Filament\\App\\Resources')
             ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\\Filament\\App\\Pages')
             ->pages([
