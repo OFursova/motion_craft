@@ -22,6 +22,13 @@ return [
         'Quiz' => 'Quiz',
         'File' => 'File'
     ],
+    'tooltip' => [
+        'available' => 'Course is purchased and available to watch',
+        'favorite' => 'Course is marked as favorite',
+        'finished' => 'Course is finished',
+        'watchlist' => 'Course is added to your watchlist',
+        'default' => 'Course is not available to watch yet'
+    ],
     'Archived' => 'Archived',
     'not_started' => 'Not started',
     'finished' => 'Finished',

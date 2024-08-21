@@ -2,6 +2,7 @@
 
 namespace App\Filament\App\Resources;
 
+use App\Enums\CourseTypeEnum;
 use App\Enums\DurationEnum;
 use App\Enums\LevelEnum;
 use App\Filament\App\Resources\CourseResource\Pages;
@@ -27,6 +28,7 @@ use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Columns\Layout\Grid;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Cache;
 
 class CourseResource extends Resource
@@ -71,18 +73,25 @@ class CourseResource extends Resource
                                     ->formatStateUsing(fn($state) => __('courses.levels.' . $state->name))
                                     ->badge()
                                     ->color(Color::Zinc)
-                                    ->icon('heroicon-o-chart-bar'),
+                                    ->icon('heroicon-o-chart-bar')
+                                    ->columnSpan(4),
                                 Tables\Columns\TextColumn::make('lessons_sum_duration')
                                     ->formatStateUsing(fn($state) => Converter::durationInMinutes($state))
                                     ->sum('lessons', 'duration')
-                                    ->extraAttributes(['class' => 'pl-6'])
-                                    ->icon('heroicon-o-clock'),
+                                    ->extraAttributes(['class' => 'px-3'])
+                                    ->icon('heroicon-o-clock')
+                                    ->columnSpan(3),
                                 Tables\Columns\TextColumn::make('lessons_count')
                                     ->formatStateUsing(fn($state) => $state . ' ' . trans_choice('courses.lessons', $state))
                                     ->counts('lessons')
-                                    ->icon('heroicon-o-book-open'),
+                                    ->icon('heroicon-o-book-open')
+                                    ->columnSpan(4),
+                                Tables\Columns\IconColumn::make('id')
+                                    ->tooltip(fn(Course $record) => __(CourseTypeEnum::getStatus($record, 'tooltip')))
+                                    ->color(fn(Course $record) => CourseTypeEnum::getStatus($record, 'color'))
+                                    ->icon(fn(Course $record) => CourseTypeEnum::getStatus($record, 'icon')),
                             ])
-                            ->columns(3)
+                            ->columns(12)
                             ->columnSpanFull(),
                         Tables\Columns\ImageColumn::make('cover')
                             ->defaultImageUrl(asset('storage/cover-images/cover_img_1.webp'))
@@ -99,7 +108,7 @@ class CourseResource extends Resource
                                 Tables\Columns\TextColumn::make('categories.title')
                                     ->badge(),
                             ])
-                            ->extraAttributes(['class' => 'min-h-48'])
+                            ->extraAttributes(['class' => 'min-h-48 even-content'])
                             ->columns(1)
                             ->columnSpanFull(),
                     ]),
@@ -107,7 +116,13 @@ class CourseResource extends Resource
             ->contentGrid(['md' => 2, 'xl' => 3])
             ->paginationPageOptions([9, 30, 60])
             ->defaultSort('id', 'desc')
-            ->modifyQueryUsing(fn(Builder $query): Builder => $query->visible())
+            ->modifyQueryUsing(fn(Builder $query): Builder => $query->visible()
+                ->with([
+                    'users' => fn(BelongsToMany $query): BelongsToMany => $query
+                        ->select(['id', 'name', 'avatar_url'])
+                        ->where('id', auth()->id())
+                ])
+            )
             ->filters([
                 Tables\Filters\SelectFilter::make('level')
                     ->translateLabel()
@@ -123,18 +138,22 @@ class CourseResource extends Resource
             ->actions([
                 TableAction::make('Watchlist')
                     ->hiddenLabel()
+                    ->action(fn(Course $record) => $record->users->first()?->pivot?->watchlist
+                        ? auth()->user()->watchlistCourses()->updateExistingPivot($record->id, ['watchlist' => false])
+                        : auth()->user()->watchlistCourses()->syncWithPivotValues([$record->id], ['watchlist' => true], false))
                     ->button()
-                    ->tooltip(__('Add to Watchlist'))
-                    ->icon('heroicon-c-plus'),
+                    ->tooltip(fn(Course $record) => $record->users->first()?->pivot?->watchlist ? __('Remove from Watchlist') : __('Add to Watchlist'))
+                    ->icon(fn(Course $record) => $record->users->first()?->pivot?->watchlist ? 'heroicon-c-minus' : 'heroicon-c-plus'),
                 TableAction::make(__('Purchase'))
                     ->button()
-                    ->visible(false)
+                    ->visible(fn(Course $record) => !$record->users->first()?->pivot?->purchased_at)
+                    ->action(fn(Course $record) => auth()->user()->courses()->syncWithPivotValues([$record->id], ['purchased_at' => now()], false))
                     ->icon('heroicon-s-credit-card')
                     ->color(Color::Lime),
                 Tables\Actions\ViewAction::make()
                     ->label(__('Watch'))
                     ->button()
-                    ->visible(true)
+                    ->visible(fn(Course $record) => (bool)$record->users->first()?->pivot?->purchased_at)
                     ->color(Color::Lime),
             ]);
     }

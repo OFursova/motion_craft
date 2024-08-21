@@ -65,4 +65,10 @@ class Course extends Model
     {
         return $this->hasMany(Unit::class)->orderBy('position');
     }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot(['favorite', 'watchlist', 'purchased_at', 'completed_at']);
+    }
 }

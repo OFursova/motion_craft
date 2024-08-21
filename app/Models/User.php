@@ -77,8 +77,34 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         return Storage::url($this->avatar_url);
     }
 
+    public function courses(): BelongsToMany
+    {
+        return $this->belongsToMany(Course::class)
+            ->withPivot(['favorite', 'watchlist', 'purchased_at', 'completed_at'])
+            ->whereNotNull('purchased_at');
+    }
+
+    public function favoriteCourses(): BelongsToMany
+    {
+        return $this->courses()->where('favorite', true);
+    }
+
+    public function finishedCourses(): BelongsToMany
+    {
+        return $this->courses()->whereNotNull('completed_at');
+    }
+
+    public function watchlistCourses(): BelongsToMany
+    {
+        return $this->belongsToMany(Course::class)
+            ->withPivot(['favorite', 'watchlist', 'purchased_at', 'completed_at'])
+            ->where('watchlist', true);
+    }
+
     public function lessons(): BelongsToMany
     {
-        return $this->belongsToMany(Lesson::class);
+        return $this->belongsToMany(Lesson::class)
+            ->withPivot(['course_id', 'completed_at'])
+            ->orderBy('lesson_user.completed_at');
     }
 }

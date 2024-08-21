@@ -5,3 +5,11 @@
 .fi-ta-actions {
     justify-content: space-between !important;
 }
+
+.even-content > .grid {
+    display: grid;
+    grid-template-rows: repeat(auto-fit, minmax(0, 1fr));
+    justify-content: space-between;
+    align-content: space-between;
+    gap: 1rem;
+}
