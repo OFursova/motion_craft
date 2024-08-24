@@ -8,6 +8,7 @@ use App\Enums\LevelEnum;
 use App\Filament\App\Resources\CourseResource\Pages;
 use App\Filament\App\Resources\CourseResource\RelationManagers;
 use App\Filament\Entries\CurriculumEntry;
+use App\Infolists\Components\ProgressEntry;
 use App\Models\Course;
 use App\Services\Converter;
 use Filament\Forms\Form;
@@ -96,7 +97,7 @@ class CourseResource extends Resource
                         Tables\Columns\ImageColumn::make('cover')
                             ->defaultImageUrl(asset('storage/cover-images/cover_img_1.webp'))
                             ->height(200)
-                            ->extraImgAttributes(['class' => 'w-full rounded']),
+                            ->extraImgAttributes(['class' => 'w-full rounded pt-2']),
                         Grid::make()
                             ->schema([
                                 Tables\Columns\TextColumn::make('title')
@@ -167,6 +168,8 @@ class CourseResource extends Resource
                 )])
             ->loadSum('lessons', 'duration');
 
+        $totalLessons = $infolist->getRecord()->lessons_count;
+
         return $infolist
             ->schema([
                 Split::make([
@@ -203,13 +206,18 @@ class CourseResource extends Resource
                                     TextEntry::make('overview')
                                         ->hiddenLabel()
                                         ->columnSpanFull(),
+                                    ProgressEntry::make('progress')
+                                        ->hiddenLabel()
+                                        ->progress($totalLessons, $infolist->getRecord()->finished_lessons)
+                                        ->columnSpanFull(),
+
                                     Group::make()
                                         ->schema([
                                             TextEntry::make('finished_lessons')
                                                 ->hiddenLabel()
                                                 ->formatStateUsing(fn($state) => match ($state) {
                                                     0 => __('courses.not_started'),
-                                                    $infolist->getRecord()->lessons_count => __('courses.finished_all'),
+                                                    $totalLessons => __('courses.finished_all'),
                                                     default => sprintf('%s %s %s', __('courses.finished'), $state, trans_choice('courses.lessons', $state))
                                                 })
                                                 ->icon('heroicon-c-check')
