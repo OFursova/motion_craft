@@ -28,6 +28,7 @@
     "Duration": "Длительность",
     "Edit": "Редактирование",
     "Email": "Почта",
+    "Favorites": "Избранное",
     "Finished": "Окончен",
     "Free": "Бесплатный",
     "Is admin": "Админ",
@@ -36,8 +37,11 @@
     "Lessons": "Уроки",
     "Level": "Уровень",
     "Log in": "Войти",
+    "My Courses": "Мои курсы",
+    "My Latest Courses" : "Мои последние курсы",
     "Name": "Имя",
     "Not Complete": "Не окончен",
+    "Nothing found": "Не найдено",
     "Overview": "Описание",
     "Position": "Позиция",
     "Purchase": "Купить",
@@ -58,5 +62,6 @@
     "User": "Пользователь",
     "Users": "Пользователи",
     "Visible": "Опубликованный",
-    "Watch": "Смотреть"
+    "Watch": "Смотреть",
+    "Watchlist Courses": "Список просмотра"
 }

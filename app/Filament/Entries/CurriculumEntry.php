@@ -57,7 +57,7 @@ final class CurriculumEntry
                 ->schema([
                     TextEntry::make('title')
                         ->hiddenLabel()
-                        ->formatStateUsing(fn($state) => __('Unit') . ' ' . $course->units->where('title', $state)->first()?->id .'. ' . $state)
+                        ->formatStateUsing(fn($state) => __('Unit') . ' ' . $course->units->where('title', $state)->first()?->position .'. ' . $state)
                         ->icon('heroicon-o-bookmark')
                         ->size(TextEntry\TextEntrySize::Medium)
                         ->weight('font-bold'),

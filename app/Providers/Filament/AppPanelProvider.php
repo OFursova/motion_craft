@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\App\Pages\Dashboard;
+use App\Filament\App\Widgets\ContinueWatching;
 use App\Filament\Auth\EditProfile;
 use App\Filament\Auth\UserAppRegistration;
 use Filament\Http\Middleware\Authenticate;
@@ -58,7 +59,7 @@ class AppPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/App/Widgets'), for: 'App\\Filament\\App\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                ContinueWatching::class,
             ])
             ->middleware([
                 EncryptCookies::class,

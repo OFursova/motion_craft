@@ -33,6 +33,7 @@ return [
     'not_started' => 'Не начат',
     'finished' => 'Просмотрено',
     'finished_all' => 'Просмотрены все уроки',
+    'finished_lessons' => '{0} Просмотрено :finished уроков из :total|[1] Просмотрен :finished урок из :total|[2,4] Просмотрено :finished урока из :total|[5,*] Просмотрено :finished уроков из :total',
     'Free' => 'Бесплатные',
     'Visible' => 'Опубликованные',
     'watched' => 'Урок уже просмотрен',

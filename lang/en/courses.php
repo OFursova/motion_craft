@@ -33,6 +33,7 @@ return [
     'not_started' => 'Not started',
     'finished' => 'Finished',
     'finished_all' => 'Finished all',
+    'finished_lessons' => 'Finished {0} :finished lessons from :total|[1] Finished :finished lesson from :total|[2,*] Finished :finished lessons from :total',
     'Free' => 'Free',
     'Visible' => 'Visible',
     'watched' => 'Lesson is watched',

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\LevelEnum;
 use App\Models\Traits\Publishable;
 use App\Models\Traits\Sluggable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -70,5 +71,25 @@ class Course extends Model
     {
         return $this->belongsToMany(User::class)
             ->withPivot(['favorite', 'watchlist', 'purchased_at', 'completed_at']);
+    }
+
+    public function scopeBelongsToAuthUser(Builder $query): void
+    {
+        $query->visible()
+            ->whereHas('users', fn ($query) => $query->where('id', auth()->id()));
+    }
+
+    public function scopeVisible(Builder $query): void
+    {
+        $query->where('visible', true);
+    }
+
+    public function scopeWithAuthUser(Builder $query): void
+    {
+        $query->visible()
+            ->withWhereHas('users', fn ($query) => $query
+                ->select(['id', 'name', 'avatar_url'])
+                ->where('id', auth()->id())
+            );
     }
 }

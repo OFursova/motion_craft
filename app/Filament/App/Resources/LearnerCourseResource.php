@@ -5,12 +5,15 @@ namespace App\Filament\App\Resources;
 use App\Enums\CourseTypeEnum;
 use App\Enums\DurationEnum;
 use App\Enums\LevelEnum;
-use App\Filament\App\Resources\CourseResource\Pages;
-use App\Filament\App\Resources\CourseResource\RelationManagers;
+use App\Filament\App\Resources\CourseResource\Pages\WatchCourse;
+use App\Filament\App\Resources\LearnerCourseResource\Pages;
+use App\Filament\App\Resources\LearnerCourseResource\RelationManagers;
 use App\Filament\Entries\CurriculumEntry;
 use App\Infolists\Components\ProgressEntry;
 use App\Models\Course;
+use App\Models\LearnerCourse;
 use App\Services\Converter;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Actions;
 use Filament\Infolists\Components\Actions\Action;
@@ -27,16 +30,17 @@ use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Columns\Layout\Grid;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class CourseResource extends Resource
+class LearnerCourseResource extends Resource
 {
     protected static ?string $model = Course::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-book-open';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $recordTitleAttribute = 'title';
 
@@ -50,14 +54,6 @@ class CourseResource extends Resource
     public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->with(['categories:id,title']);
-    }
-
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                //
-            ]);
     }
 
     public static function table(Table $table): Table
@@ -118,24 +114,25 @@ class CourseResource extends Resource
             ->contentGrid(['md' => 2, 'xl' => 3])
             ->paginationPageOptions([9, 30, 60])
             ->defaultSort('id', 'desc')
-            ->modifyQueryUsing(fn(Builder $query): Builder => $query->visible()
-                ->with([
-                    'users' => fn(BelongsToMany $query): BelongsToMany => $query
-                        ->select(['id', 'name', 'avatar_url'])
-                        ->where('id', auth()->id())
-                ])
-            )
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->withAuthUser())
             ->filters([
-                Tables\Filters\SelectFilter::make('level')
-                    ->translateLabel()
-                    ->options(LevelEnum::getOptions()),
-                Tables\Filters\SelectFilter::make('category')
-                    ->translateLabel()
-                    ->relationship('categories', 'title')
-                    ->searchable()
-                    ->preload(),
-                Tables\Filters\TernaryFilter::make('free')
-                    ->translateLabel(),
+                Tables\Filters\SelectFilter::make('status')
+                    ->label('Status')
+                    ->options([
+                        'watchlisted' => 'Watchlisted',
+                        'favorite' => 'Favorite',
+                    ])
+                    ->query(function (Builder $query, $state) {
+                        $query->whereHas('users', function ($query) use ($state) {
+                            $query->where('user_id', auth()->id());
+
+                            if ($state['value'] === 'watchlisted') {
+                                $query->where('course_user.watchlist', true);
+                            } elseif ($state['value'] === 'favorite') {
+                                $query->where('course_user.favorite', true);
+                            }
+                        });
+                    }),
             ])
             ->actions([
                 TableAction::make('Watchlist')
@@ -243,7 +240,7 @@ class CourseResource extends Resource
                                             ->button()
                                             ->icon('heroicon-o-play-circle')
                                             ->visible(true)
-                                            ->url(Pages\WatchCourse::getUrl(['record' => $infolist->getRecord()]))
+                                            ->url(WatchCourse::getUrl(['record' => $infolist->getRecord()]))
                                     ]),
                                 ]),
                             Section::make('')
@@ -285,15 +282,9 @@ class CourseResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCourses::route('/'),
+            'index' => Pages\ListLearnerCourses::route('/'),
             'view' => Pages\ViewCourse::route('/{record}'),
-            'watch' => Pages\WatchCourse::route('{record}/watch')
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return Cache::get('course_badge') ? 'NEW' : null;
     }
 
     public static function getModelLabel(): string
@@ -303,11 +294,11 @@ class CourseResource extends Resource
 
     public static function getPluralModelLabel(): string
     {
-        return __('All Courses');
+        return __('My Courses');
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('Courses');
+        return __('My Courses');
     }
 }
