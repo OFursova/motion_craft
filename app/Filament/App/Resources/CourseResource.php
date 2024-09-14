@@ -238,7 +238,7 @@ class CourseResource extends Resource
                                     Actions::make([
                                         Actions\Action::make('watch')
                                             ->label(fn(Course $course) => auth()->user()->lessons()->where('course_id', $course->id)->exists()
-                                                ? __('Continue watching')
+                                                ? __('Continue')
                                                 : __('Start watching'))
                                             ->button()
                                             ->icon('heroicon-o-play-circle')

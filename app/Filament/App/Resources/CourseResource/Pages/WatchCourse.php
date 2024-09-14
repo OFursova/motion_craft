@@ -94,6 +94,8 @@ class WatchCourse extends Page
             ],
             false);
 
+        // TODO check if course is finished
+
         $currentLessonPosition = $this->record->lessons
             ->where('id', $lesson->id)
             ->first()

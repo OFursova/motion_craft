@@ -48,6 +48,7 @@ class FavoriteCourses extends BaseWidget
                 ViewAction::make()
                     ->label(__('Watch'))
                     ->button()
+                    ->icon('heroicon-s-play')
                     ->color(Color::Lime)
                     ->url(fn(Course $record): string => WatchCourse::getUrl(['record' => $record]))
                     ->openUrlInNewTab(),
