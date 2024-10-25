@@ -104,8 +104,10 @@ class CourseResource extends Resource
                                 Tables\Columns\TextColumn::make('title')
                                     ->weight(FontWeight::Bold)
                                     ->size(Tables\Columns\TextColumn\TextColumnSize::Large)
+                                    ->extraAttributes(['class' => 'clamped-2'])
                                     ->searchable(),
                                 Tables\Columns\TextColumn::make('overview')
+                                    ->extraAttributes(['class' => 'clamped-4'])
                                     ->html(),
                                 Tables\Columns\TextColumn::make('categories.title')
                                     ->badge(),

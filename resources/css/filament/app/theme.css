@@ -6,6 +6,16 @@
     justify-content: space-between !important;
 }
 
+.clamped-2 span {
+    min-height: calc(1.5em * 2);
+    max-height: calc(1.5em * 2);
+    @apply line-clamp-2;
+}
+
+.clamped-4 span {
+    @apply line-clamp-4;
+}
+
 .even-content > .grid {
     display: grid;
     grid-template-rows: repeat(auto-fit, minmax(0, 1fr));

@@ -50,8 +50,7 @@ class FavoriteCourses extends BaseWidget
                     ->button()
                     ->icon('heroicon-s-play')
                     ->color(Color::Lime)
-                    ->url(fn(Course $record): string => WatchCourse::getUrl(['record' => $record]))
-                    ->openUrlInNewTab(),
+                    ->url(fn(Course $record): string => WatchCourse::getUrl(['record' => $record])),
             ])
             ->paginated(false);
     }
